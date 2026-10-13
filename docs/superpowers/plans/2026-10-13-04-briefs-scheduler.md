@@ -520,7 +520,7 @@ git commit -m "feat(brief): WhatsApp formatting helpers"
 
 Morning layout (§8.2, §7a): header, then *🗓 Today* (events), *⚠️ Overdue*, *📌 Due today*, *🗓 Due tomorrow*, *🌙 Came in overnight* (held alerts), *📬 New & important*, the couldn't-read emails, the health lines and the footer. Held items appear only under *Came in overnight*, never twice. The footer appears only when something is numbered. `counts.dueToday` counts every open item due later today, including held ones and ones hidden by the cap. `counts.urgent` counts every item the brief covers with `urgency === "urgent"`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `test/brief/morning.test.ts`:
 ```ts
@@ -644,12 +644,12 @@ describe("composeMorning", () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to confirm it fails**
+- [x] **Step 2: Run the test to confirm it fails**
 
 Run: `npx vitest run test/brief/morning.test.ts`
 Expected: FAIL, because `../../src/brief/morning.js` can't be resolved.
 
-- [ ] **Step 3: Implement the builder**
+- [x] **Step 3: Implement the builder**
 
 `src/brief/builder.ts`:
 ```ts
@@ -742,7 +742,7 @@ export class BriefBuilder {
 }
 ```
 
-- [ ] **Step 4: Implement the morning composer**
+- [x] **Step 4: Implement the morning composer**
 
 `src/brief/morning.ts`:
 ```ts
@@ -783,12 +783,12 @@ export function composeMorning(input: BriefInput, now: Date): ComposedBrief {
 }
 ```
 
-- [ ] **Step 5: Run the tests**
+- [x] **Step 5: Run the tests**
 
 Run: `npx vitest run test/brief && npm run typecheck`
 Expected: `18 passed` (12 format + 6 morning), and typecheck exits 0.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/brief/builder.ts src/brief/morning.ts test/brief/morning.test.ts
