@@ -1,4 +1,4 @@
-# kiasu-assistant
+# Kiasu
 
 Personal assistant: reads my personal + school Gmail, Google Calendar and Google Classroom,
 keeps a task list, and talks to me on WhatsApp (morning brief, evening check-in, urgent alerts, chat).

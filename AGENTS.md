@@ -4,6 +4,14 @@ This repo is **kiasu-assistant**: a single-user assistant that reads my personal
 Google Calendar and Google Classroom, keeps a task list, and talks to me on WhatsApp.
 Node 24 + TypeScript (ESM), Fastify, Zod, vitest, Firestore, Cloud Run.
 
+## Status (2026-10-13)
+All plans (00–06) are implemented and merged: 453 tests pass, and typecheck and build are clean.
+What's left are the **user-only setup steps**, marked `- [ ] (user)` in plan 06 and described in
+`docs/setup.md`: create the GCP project, run `npm run auth` and `npm run check:access`, set up Meta WhatsApp
+and its templates, `npm run deploy`, then work through `docs/e2e-checklist.md`. Unverified so far:
+`FirestoreStore` against a real emulator/Firestore (`npm run test:firestore`), and the triage eval on real emails
+(`npm run eval:triage`).
+
 ## Read first, in this order
 1. `docs/build-prompt.md`: how this build is run, and in what order.
 2. The spec: `docs/superpowers/specs/2026-10-13-kiasu-design.md`.
