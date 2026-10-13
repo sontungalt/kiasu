@@ -1299,7 +1299,7 @@ Rules:
   - Then outbox messages that are pending with `lastError !== null && attempts >= 3`. Pending messages with no error are just waiting for the 24h window, so they're not stuck.
   - Then the calendar failure line.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `test/brief/gather.test.ts`:
 ```ts
@@ -1395,12 +1395,12 @@ describe("healthLines", () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to confirm it fails**
+- [x] **Step 2: Run the test to confirm it fails**
 
 Run: `npx vitest run test/brief/gather.test.ts`
 Expected: FAIL, because `../../src/brief/gather.js` can't be resolved.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 `src/brief/gather.ts`:
 ```ts
@@ -1477,12 +1477,12 @@ export async function healthLines(store: Store, now: Date): Promise<string[]> {
 }
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `npx vitest run test/brief && npm run typecheck`
 Expected: `27 passed` (12 + 6 + 3 + 6), and typecheck exits 0.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/brief/gather.ts test/brief/gather.test.ts
