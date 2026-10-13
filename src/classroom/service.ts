@@ -8,6 +8,7 @@ import {
   googleClassroomApi, isPermissionDenied,
   type ClassroomApi, type ClassroomApiFactory, type ClassroomCourse, type ClassroomCourseWork,
 } from "./api.js";
+import { extractAnnouncement } from "./announcement.js";
 
 export type ClassroomDeps = Pick<Deps, "config" | "clock" | "log" | "store" | "anthropic">;
 
@@ -28,7 +29,10 @@ export const DAY_MS = 86_400_000;
 export const STALE_DUE_DAYS = 14;
 /** Undated work created longer ago than this is not turned into a new item. */
 export const STALE_UNDATED_DAYS = 30;
+/** Announcements created within this many days are summarised (spec §7a). */
+export const ANNOUNCEMENT_WINDOW_DAYS = 7;
 const DETAILS_MAX = 500;
+const TITLE_MAX = 80;
 const FINISHED_STATES = new Set(["TURNED_IN", "RETURNED"]);
 
 function clip(text: string, max: number): string {
@@ -38,6 +42,10 @@ function clip(text: string, max: number): string {
 export function courseDetails(courseName: string, text: string | null): string {
   const body = (text ?? "").trim();
   return body ? `${courseName}\n${clip(body, DETAILS_MAX)}` : courseName;
+}
+
+export function firstLine(text: string): string {
+  return clip(text.split("\n").map((l) => l.trim()).find((l) => l.length > 0) ?? "", TITLE_MAX);
 }
 
 export function isStale(w: ClassroomCourseWork, now: Date): boolean {
@@ -105,7 +113,54 @@ export function createClassroomService(
     }
   };
 
-  const courseSteps: Array<[string, CourseStep]> = [["coursework", syncCourseWork]];
+  const syncAnnouncements: CourseStep = async (client, course, run) => {
+    const sinceIso = new Date(run.now.getTime() - ANNOUNCEMENT_WINDOW_DAYS * DAY_MS).toISOString();
+    for (const a of await client.listRecentAnnouncements(course.id, sinceIso)) {
+      if (a.creationTime < sinceIso) continue;
+      run.result.fetched++;
+      const dedupeKey = `classroom:announcement:${a.id}`;
+      if (!(await store.processed.claim(dedupeKey, run.nowIso))) continue;
+      const extracted = a.text.trim()
+        ? await extractAnnouncement(deps, { id: a.id, courseName: course.name, text: a.text, postedAt: a.creationTime }, run.now)
+        : null;
+      if (extracted) run.result.triaged++;
+      const source = {
+        kind: "classroom" as const, courseId: course.id, courseName: course.name, courseWorkId: null, announcementId: a.id, link: a.link,
+      };
+      const draft: ItemDraft = extracted
+        ? {
+            type: extracted.dueAt ? "deadline" : "info",
+            title: extracted.title,
+            details: extracted.summary ? `${course.name}: ${extracted.summary}` : course.name,
+            dueAt: extracted.dueAt,
+            startAt: null,
+            endAt: null,
+            urgency: extracted.urgency,
+            urgencyReason: extracted.urgencyReason,
+            source,
+            dedupeKey,
+          }
+        : {
+            // Model failed, refused, or there was no text: keep a plain record so nothing is lost after the claim.
+            type: "info",
+            title: firstLine(a.text) || `New post in ${course.name}`,
+            details: courseDetails(course.name, a.text),
+            dueAt: null,
+            startAt: null,
+            endAt: null,
+            urgency: "normal",
+            urgencyReason: null,
+            source,
+            dedupeKey,
+          };
+      collect(await upsertItem(store, draft, run.now), run);
+    }
+  };
+
+  const courseSteps: Array<[string, CourseStep]> = [
+    ["coursework", syncCourseWork],
+    ["announcements", syncAnnouncements],
+  ];
 
   async function runSync(client: ClassroomApi): Promise<SyncResult> {
     const now = clock.now();

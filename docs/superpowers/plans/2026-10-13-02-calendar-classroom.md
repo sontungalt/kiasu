@@ -2190,7 +2190,7 @@ Rules:
 - `SyncResult.fetched` counts announcements in the window. `triaged` counts successful model extractions. Alerts use the same `collect` as coursework.
 - The announcements step is isolated, so a 403 there (missing scope) doesn't stop coursework.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `test/classroom/service.announcements.test.ts`:
 ```ts
@@ -2307,12 +2307,12 @@ describe("Classroom announcement sync", () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to confirm it fails**
+- [x] **Step 2: Run the test to confirm it fails**
 
 Run: `npx vitest run test/classroom/service.announcements.test.ts`
 Expected: FAIL. "summarises a new announcement into an info item" gets `null` from `find("classroom:announcement:a1")`, because no announcements step exists yet. The last test passes already.
 
-- [ ] **Step 3: Write the final `src/classroom/service.ts`**
+- [x] **Step 3: Write the final `src/classroom/service.ts`**
 
 Replace the whole file with:
 ```ts
@@ -2546,7 +2546,7 @@ export function createClassroomService(
 }
 ```
 
-- [ ] **Step 4: Run the full suite**
+- [x] **Step 4: Run the full suite**
 
 Run: `npx vitest run test/classroom test/calendar test/google/collect-pages.test.ts && npm test && npm run typecheck`
 Expected:
@@ -2554,7 +2554,7 @@ Expected:
 - Calendar: 12 tests pass. Pager: 4 tests pass.
 - `npm test` passes overall (Firestore is skipped without the emulator), and typecheck exits 0.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/classroom/service.ts test/classroom/service.announcements.test.ts
