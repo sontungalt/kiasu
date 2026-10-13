@@ -194,3 +194,23 @@ curl -s -X POST "http://localhost:8080/jobs/tick?now=2026-10-14T22:31:00Z"      
 curl -s -X POST "http://localhost:8080/jobs/tick?now=2026-10-15T13:01:00Z"          # 21:01 SGT: evening check-in
 ```
 When you're done, point the Meta callback URL back at the Cloud Run URL.
+
+## Part 4: Deploy
+
+### 21. Deploy
+```bash
+npm run deploy -- --dry-run    # prints every mutating command, changes nothing
+npm run deploy
+```
+The script checks every required secret has a value, builds from source with Cloud Build, deploys `kiasu-assistant`
+(`runtime@`, unauthenticated, secrets from Secret Manager, plain config from `.env`), sets `PUBLIC_BASE_URL` to the
+service URL, creates or updates the Pub/Sub push subscription and the `tick` scheduler job (both OIDC as `invoker@`,
+audience = URL + path), checks `/healthz`, and runs `npm run gmail:watch`.
+
+### 22. After the first deploy
+- [ ] Paste the printed Callback URL (`…/webhooks/whatsapp`) into Meta (step 15) and click **Verify and save**.
+- [ ] `npm run gmail:watch` prints ✅ with an expiry about 7 days out for each connected account. The tick renews it.
+- [ ] After `npm run auth -- <account>` (token reconnect), start a new revision so it reads the new secret:
+  `gcloud run services update kiasu-assistant --region=asia-southeast1 --update-env-vars=SECRETS_REFRESHED_AT=$(date +%s)`
+- [ ] Connecting an account for the first time after a deploy (its secret had no value then, so it isn't mounted): run `npm run deploy` instead.
+- [ ] Changing plain config (e.g. `CLASSROOM_ENABLED`) → edit `.env` → `npm run deploy`.
