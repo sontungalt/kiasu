@@ -1832,7 +1832,7 @@ Expected: all 12 files listed, and tests and typecheck pass. If a file is missin
 
 Build order (no cycles): config → clock → log → store → anthropic → whatsapp → outbox → notifier → mail → calendar → classroom → agent → tasks → `buildServer`. In dev (`DEV_SKIP_OIDC=true`) the inline task queue `app.inject`s `POST /tasks/handle-message`. It runs exactly the route Cloud Tasks would call, so dev and prod share one code path. The app reference is bound after `buildServer` returns.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `test/main.test.ts`:
 ```ts
@@ -1951,12 +1951,12 @@ describe("chooseStoreKind", () => {
 });
 ```
 
-- [ ] **Step 2: Run it to confirm it fails**
+- [x] **Step 2: Run it to confirm it fails**
 
 Run: `npx vitest run test/main.test.ts`
 Expected: FAIL with "Cannot find module '../src/app.js'".
 
-- [ ] **Step 3: Implement `src/app.ts`**
+- [x] **Step 3: Implement `src/app.ts`**
 
 ```ts
 import Anthropic from "@anthropic-ai/sdk";
@@ -2057,7 +2057,7 @@ export async function buildApp(config: Config, opts: BuildOptions = {}): Promise
 }
 ```
 
-- [ ] **Step 4: Implement `src/main.ts`**
+- [x] **Step 4: Implement `src/main.ts`**
 
 ```ts
 import { loadConfig } from "./config.js";
@@ -2097,7 +2097,7 @@ main().catch((err: unknown) => {
 });
 ```
 
-- [ ] **Step 5: Document `STORE` in `.env.example`**
+- [x] **Step 5: Document `STORE` in `.env.example`**
 
 Run:
 ```bash
@@ -2106,12 +2106,12 @@ tail -3 .env.example
 ```
 Expected: the two new comment lines.
 
-- [ ] **Step 6: Run the tests**
+- [x] **Step 6: Run the tests**
 
 Run: `npx vitest run test/main.test.ts && npm run typecheck`
 Expected: 6 passed, and typecheck exits 0. If typecheck reports a factory signature mismatch, the sibling plan's actual export wins: fix the call here (the names are fixed, the `Pick<…>` sets are listed above). Don't edit the sibling module.
 
-- [ ] **Step 7: Run the real entry point locally and check SIGTERM**
+- [x] **Step 7: Run the real entry point locally and check SIGTERM**
 
 Run (needs a filled-in `.env`; `STORE=memory` keeps it off Firestore):
 ```bash
@@ -2122,7 +2122,7 @@ kill -TERM $PID; wait $PID; echo "exit=$?"
 ```
 Expected: a JSON `"listening"` log line, then `{"ok":true}`, then a `"shutting down"` log line with `"signal":"SIGTERM"`, then `exit=0`.
 
-- [ ] **Step 8: Full suite and commit**
+- [x] **Step 8: Full suite and commit**
 
 Run: `npm test && npm run typecheck`
 Expected: all pass.
