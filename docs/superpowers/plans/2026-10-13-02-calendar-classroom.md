@@ -776,7 +776,7 @@ git commit -m "feat(calendar): CalendarService merging both accounts with dedupe
   - `googleClassroomApi: ClassroomApiFactory`
   - `isPermissionDenied(err: unknown): boolean`
 
-- [ ] **Step 1: Write the failing due-date test**
+- [x] **Step 1: Write the failing due-date test**
 
 `test/classroom/due.test.ts`:
 ```ts
@@ -819,7 +819,7 @@ describe("classroomDueAt", () => {
 });
 ```
 
-- [ ] **Step 2: Write the failing Classroom adapter test**
+- [x] **Step 2: Write the failing Classroom adapter test**
 
 `test/classroom/api.test.ts`:
 ```ts
@@ -975,12 +975,12 @@ describe("classroomApiFromClient", () => {
 });
 ```
 
-- [ ] **Step 3: Run the tests to confirm they fail**
+- [x] **Step 3: Run the tests to confirm they fail**
 
 Run: `npx vitest run test/classroom/due.test.ts test/classroom/api.test.ts`
 Expected: FAIL with "Cannot find module '../../src/classroom/due.js'" (and the same for `api.js`).
 
-- [ ] **Step 4: Implement `src/classroom/due.ts`**
+- [x] **Step 4: Implement `src/classroom/due.ts`**
 
 ```ts
 import { sgtAt } from "../lib/clock.js";
@@ -1020,7 +1020,7 @@ export function classroomDueAt(date?: ClassroomDate | null, time?: ClassroomTime
 }
 ```
 
-- [ ] **Step 5: Implement `src/classroom/api.ts`**
+- [x] **Step 5: Implement `src/classroom/api.ts`**
 
 ```ts
 import { google } from "googleapis";
@@ -1253,13 +1253,13 @@ export const googleClassroomApi: ClassroomApiFactory = (auth) => {
 };
 ```
 
-- [ ] **Step 6: Run the tests**
+- [x] **Step 6: Run the tests**
 
 Run: `npx vitest run test/classroom/due.test.ts test/classroom/api.test.ts && npm run typecheck`
 Expected: PASS, 13 tests (6 due + 7 api), and typecheck exits 0.
 If typecheck rejects a `googleClassroomApi` line, widen the matching `Raw*` field to the googleapis `Schema$*` type. Do not cast to `any`.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/classroom/due.ts src/classroom/api.ts test/classroom/due.test.ts test/classroom/api.test.ts
