@@ -2413,7 +2413,7 @@ Behaviour:
 - **`retryPendingTriage(limit = 20)`** re-fetches each pending email (a 404 marks it `skipped`) and calls `triageRecord`.
 - **`renewWatchIfNeeded`**, **`search`** and **`read`** delegate to Task 7.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `test/gmail/sync.test.ts`:
 ```ts
@@ -2655,12 +2655,12 @@ describe("handlePush and delegation", () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests to confirm they fail**
+- [x] **Step 2: Run the tests to confirm they fail**
 
 Run: `npx vitest run test/gmail/sync.test.ts`
 Expected: FAIL, `../../src/gmail/sync.js` not found.
 
-- [ ] **Step 3: Implement `src/gmail/sync.ts`**
+- [x] **Step 3: Implement `src/gmail/sync.ts`**
 
 ```ts
 import { ACCOUNT_IDS, type AccountId, type Item } from "../types.js";
@@ -2849,12 +2849,12 @@ export function createMailService(
 }
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `npx vitest run test/gmail && npm run typecheck`
 Expected: every `test/gmail` file passes. That's sync 15, plus api 9, fake-gmail 2, parse 10, account 5, process 12, watch 4 and lookup 5, for 62 in total.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/gmail/sync.ts test/gmail/sync.test.ts
