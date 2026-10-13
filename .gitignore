@@ -7,3 +7,7 @@ evals/triage/fixtures/
 evals/triage/labels.json
 .DS_Store
 .claude/
+
+# Firebase service-account key (never commit)
+firebase-key.json
+*-firebase-adminsdk-*.json
