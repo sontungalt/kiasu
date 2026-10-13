@@ -2149,7 +2149,7 @@ git commit -m "feat: composition root (buildDeps/buildApp) and main entry point"
 
 How `deploy.sh` avoids the "first deploy before `PUBLIC_BASE_URL` is known" trap: Cloud Run gives each service a deterministic URL, `https://kiasu-assistant-<PROJECT_NUMBER>.asia-southeast1.run.app`. The script uses it (or the existing service's `status.url`) as `PUBLIC_BASE_URL` for the deploy. Afterwards it re-reads `status.url`. If that differs, it runs `gcloud run services update --update-env-vars=PUBLIC_BASE_URL=<real>` and wires Pub/Sub and Scheduler to the real URL. **No manual second deploy is needed.** The local `.env`'s `PUBLIC_BASE_URL` (the tunnel URL) is never sent to Cloud Run.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `test/scripts/deploy-env.test.ts`:
 ```ts
@@ -2322,12 +2322,12 @@ describe("watchErrorHint", () => {
 });
 ```
 
-- [ ] **Step 2: Run them to confirm they fail**
+- [x] **Step 2: Run them to confirm they fail**
 
 Run: `npx vitest run test/scripts/deploy-env.test.ts test/scripts/deploy.test.ts test/scripts/watch.test.ts`
 Expected: FAIL. The modules aren't found, and `scripts/deploy.sh` is missing (exit 127).
 
-- [ ] **Step 3: Implement `scripts/lib/deploy-env.ts` and `scripts/render-run-env.ts`**
+- [x] **Step 3: Implement `scripts/lib/deploy-env.ts` and `scripts/render-run-env.ts`**
 
 `scripts/lib/deploy-env.ts`:
 ```ts
@@ -2406,7 +2406,7 @@ writeFileSync(arg("out"), toEnvYaml(env), { mode: 0o600 });
 console.error(`Plain env vars for Cloud Run (no secrets): ${Object.keys(env).join(", ")}`);
 ```
 
-- [ ] **Step 4: Implement `scripts/deploy.sh`**
+- [x] **Step 4: Implement `scripts/deploy.sh`**
 
 ```bash
 #!/usr/bin/env bash
@@ -2534,7 +2534,7 @@ EOF
 
 Run: `chmod +x scripts/deploy.sh`
 
-- [ ] **Step 5: Implement `scripts/lib/watch.ts` and `scripts/gmail-watch.ts`**
+- [x] **Step 5: Implement `scripts/lib/watch.ts` and `scripts/gmail-watch.ts`**
 
 `scripts/lib/watch.ts`:
 ```ts
@@ -2612,7 +2612,7 @@ main().then(
 ```
 (`process.exit` because the Firestore client keeps sockets open.)
 
-- [ ] **Step 6: Add the npm scripts and run the tests**
+- [x] **Step 6: Add the npm scripts and run the tests** (13 passed; `lint:sh` skipped: shellcheck not installed)
 
 ```bash
 npm pkg set "scripts.deploy=bash scripts/deploy.sh"
@@ -2622,7 +2622,7 @@ npm run lint:sh
 ```
 Expected: 3 + 6 + 4 = 13 passed, and shellcheck prints nothing.
 
-- [ ] **Step 7: Append Part 4 (deploy) to `docs/setup.md`**
+- [x] **Step 7: Append Part 4 (deploy) to `docs/setup.md`**
 
 ````markdown
 
@@ -2646,7 +2646,7 @@ audience = URL + path), checks `/healthz`, and runs `npm run gmail:watch`.
 - [ ] Changing plain config (e.g. `CLASSROOM_ENABLED`) → edit `.env` → `npm run deploy`.
 ````
 
-- [ ] **Step 8: Deploy for real (manual)**
+- [ ] (user) **Step 8: Deploy for real (manual)**
 
 Run: `npm run deploy`
 Expected, in order: `==> Checking that secrets have a value`, the Cloud Build log, then `Service URL …` (`status.url`), then the subscription and scheduler created, then `{"ok":true}`, then `✅ personal: watch expires …` (and school if connected), then the `Deployed: https://kiasu-assistant-<number>.asia-southeast1.run.app` block.
@@ -2658,7 +2658,7 @@ gcloud run services describe kiasu-assistant --region=asia-southeast1 --format=j
 ```
 Expected: `<URL>/webhooks/gmail`, `<URL>/jobs/tick`, and `"value": "<URL>"`, all with the same `<URL>` and no trailing slash.
 
-- [ ] **Step 9: Full suite and commit**
+- [x] **Step 9: Full suite and commit**
 
 ```bash
 npm test && npm run typecheck

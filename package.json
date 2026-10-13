@@ -17,7 +17,9 @@
     "auth": "tsx --env-file=.env scripts/auth-google.ts",
     "check:access": "tsx --env-file=.env scripts/check-access.ts",
     "setup:gcp": "bash scripts/setup-gcp.sh",
-    "lint:sh": "shellcheck -x scripts/*.sh scripts/lib/*.sh"
+    "lint:sh": "shellcheck -x scripts/*.sh scripts/lib/*.sh",
+    "deploy": "bash scripts/deploy.sh",
+    "gmail:watch": "tsx --env-file=.env scripts/gmail-watch.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",
