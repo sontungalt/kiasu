@@ -105,7 +105,7 @@ package.json              # + "eval:triage", "export:fixtures" scripts
   - `httpStatusOf(err: unknown): number | null`, `errInfo(err: unknown): { name: string; status: number | null; message: string }`
   - Test helpers: `class FakeGmailApi implements GmailApi`, `buildMessage(opts)`, `httpError(status)`, `invalidGrantError()`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `test/gmail/api.test.ts`:
 ```ts
@@ -259,12 +259,12 @@ describe("FakeGmailApi", () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests to confirm they fail**
+- [x] **Step 2: Run the tests to confirm they fail**
 
 Run: `npx vitest run test/gmail/api.test.ts test/gmail/fake-gmail.test.ts`
 Expected: FAIL, with `../../src/gmail/api.js` and `../helpers/fake-gmail.js` not found.
 
-- [ ] **Step 3: Implement `src/gmail/api.ts`**
+- [x] **Step 3: Implement `src/gmail/api.ts`**
 
 ```ts
 import { google, type gmail_v1 } from "googleapis";
@@ -406,7 +406,7 @@ export function createGmailApiFactory(config: Config): GmailApiFactory {
 }
 ```
 
-- [ ] **Step 4: Implement `test/helpers/fake-gmail.ts`**
+- [x] **Step 4: Implement `test/helpers/fake-gmail.ts`**
 
 ```ts
 import type { GmailApi, GmailMessage, MessageRef } from "../../src/gmail/api.js";
@@ -529,12 +529,12 @@ export class FakeGmailApi implements GmailApi {
 }
 ```
 
-- [ ] **Step 5: Run the tests**
+- [x] **Step 5: Run the tests**
 
 Run: `npx vitest run test/gmail/api.test.ts test/gmail/fake-gmail.test.ts && npm run typecheck`
 Expected: 11 passed (9 + 2), and typecheck exits 0.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/gmail/api.ts test/helpers/fake-gmail.ts test/gmail/api.test.ts test/gmail/fake-gmail.test.ts
@@ -559,7 +559,7 @@ git commit -m "feat(gmail): fakeable Gmail API port over googleapis"
 
 Rules: prefer `text/plain`, and fall back to HTML converted to text. Walk nested multiparts. Any part with a filename is an attachment (its name is collected and its body skipped). Decode using the part's charset. The received time is `internalDate`, then the `Date` header, then `fallbackDate`.
 
-- [ ] **Step 1: Write the fixtures**
+- [x] **Step 1: Write the fixtures**
 
 `test/fixtures/gmail-messages.ts`:
 ```ts
@@ -770,7 +770,7 @@ export const metadataOnly: GmailMessage = {
 };
 ```
 
-- [ ] **Step 2: Write the failing tests**
+- [x] **Step 2: Write the failing tests**
 
 `test/gmail/parse.test.ts`:
 ```ts
@@ -884,12 +884,12 @@ describe("helpers", () => {
 });
 ```
 
-- [ ] **Step 3: Run the tests to confirm they fail**
+- [x] **Step 3: Run the tests to confirm they fail**
 
 Run: `npx vitest run test/gmail/parse.test.ts`
 Expected: FAIL, `../../src/gmail/parse.js` not found.
 
-- [ ] **Step 4: Implement `src/gmail/parse.ts`**
+- [x] **Step 4: Implement `src/gmail/parse.ts`**
 
 ```ts
 import { convert } from "html-to-text";
@@ -1043,12 +1043,12 @@ export function searchHitFromMessage(msg: GmailMessage, account: AccountId, fall
 }
 ```
 
-- [ ] **Step 5: Run the tests**
+- [x] **Step 5: Run the tests**
 
 Run: `npx vitest run test/gmail/parse.test.ts && npm run typecheck`
 Expected: 10 passed.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/gmail/parse.ts test/fixtures/gmail-messages.ts test/gmail/parse.test.ts
@@ -1073,7 +1073,7 @@ git commit -m "feat(gmail): parse messages to ParsedEmail (plain/HTML, attachmen
 
 The Zod schema carries **no length or format constraints**. The API ignores them, and Zod would then reject an otherwise good answer. The 200-character summary limit is applied in `normaliseTriage` (Task 4).
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `test/triage/schema.test.ts`:
 ```ts
@@ -1200,12 +1200,12 @@ describe("SYSTEM_PROMPT", () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests to confirm they fail**
+- [x] **Step 2: Run the tests to confirm they fail**
 
 Run: `npx vitest run test/triage/schema.test.ts test/triage/prompt.test.ts`
 Expected: FAIL, modules not found.
 
-- [ ] **Step 3: Implement `src/triage/schema.ts`**
+- [x] **Step 3: Implement `src/triage/schema.ts`**
 
 ```ts
 import { z } from "zod";
@@ -1275,7 +1275,7 @@ export function toStructuredOutputSchema(node: unknown): unknown {
 export const TRIAGE_JSON_SCHEMA = toStructuredOutputSchema(z.toJSONSchema(TriageSchema)) as JsonObject;
 ```
 
-- [ ] **Step 4: Implement `src/triage/prompt.ts`**
+- [x] **Step 4: Implement `src/triage/prompt.ts`**
 
 ```ts
 import type { AccountId, ParsedEmail } from "../types.js";
@@ -1355,12 +1355,12 @@ export function buildTriageInput(parsed: ParsedEmail, account: AccountId, now: D
 }
 ```
 
-- [ ] **Step 5: Run the tests**
+- [x] **Step 5: Run the tests**
 
 Run: `npx vitest run test/triage/schema.test.ts test/triage/prompt.test.ts && npm run typecheck`
 Expected: 10 passed (4 + 6).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/triage/schema.ts src/triage/prompt.ts test/triage/schema.test.ts test/triage/prompt.test.ts
@@ -1385,7 +1385,7 @@ git commit -m "feat(triage): Zod schema, structured-output JSON schema and promp
   - `normaliseIso(value: string | null, kind: "due" | "start"): string | null`, `normaliseTriage(raw: TriageResult): TriageResult`
   - Re-exports `TriageSchema` and `type TriageResult`, `type TriageItem`. Other plans import them from `src/triage/triage.js`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `test/triage/triage.test.ts`:
 ```ts
@@ -1512,12 +1512,12 @@ describe("normaliseIso", () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests to confirm they fail**
+- [x] **Step 2: Run the tests to confirm they fail**
 
 Run: `npx vitest run test/triage/triage.test.ts`
 Expected: FAIL, `../../src/triage/triage.js` not found.
 
-- [ ] **Step 3: Implement `src/triage/triage.ts`**
+- [x] **Step 3: Implement `src/triage/triage.ts`**
 
 ```ts
 import type Anthropic from "@anthropic-ai/sdk";
@@ -1623,12 +1623,12 @@ export async function triageEmail(
 }
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `npx vitest run test/triage && npm run typecheck`
 Expected: 18 passed (triage 8, plus schema 4 and prompt 6 from Task 3).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/triage/triage.ts test/triage/triage.test.ts
@@ -1653,7 +1653,7 @@ git commit -m "feat(triage): triageEmail with structured output, refusal and par
   - `markRevoked(ctx, account): Promise<void>`. Only the `ok` to `revoked` transition sends the notice.
   - `reconnectMessage(account): OutboundMessage`, `blankAccount(id): AccountState`, `getAccount(store, id): Promise<AccountState>`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `test/gmail/account.test.ts`:
 ```ts
@@ -1724,12 +1724,12 @@ describe("withGmail", () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests to confirm they fail**
+- [x] **Step 2: Run the tests to confirm they fail**
 
 Run: `npx vitest run test/gmail/account.test.ts`
 Expected: FAIL, `../../src/gmail/account.js` not found.
 
-- [ ] **Step 3: Implement `src/gmail/account.ts`**
+- [x] **Step 3: Implement `src/gmail/account.ts`**
 
 ```ts
 import type { Deps, OutboundMessage } from "../ports.js";
@@ -1808,12 +1808,12 @@ export async function withGmail<T>(
 }
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `npx vitest run test/gmail/account.test.ts && npm run typecheck`
 Expected: 5 passed.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/gmail/account.ts test/gmail/account.test.ts
@@ -1839,7 +1839,7 @@ git commit -m "feat(gmail): account guard for missing token, invalid_grant and r
   - `ingestParsed(ctx, parsed): Promise<SyncResult>`. It records the email. A pre-filtered email becomes `skipped`. Otherwise it's stored `pending` first (so a crash leaves it retryable) and then passed to `triageRecord`.
   - `triageRecord(ctx, record, parsed): Promise<TriageOutcome>`. On success it saves the summary, sets `done` and upserts items (none for Classroom senders), and collects `shouldAlert` hits. On failure it adds an attempt and stays `pending`, becoming `failed` at 5 attempts or straight away on a refusal.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `test/gmail/process.test.ts`:
 ```ts
@@ -1994,12 +1994,12 @@ describe("triageRecord failures", () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests to confirm they fail**
+- [x] **Step 2: Run the tests to confirm they fail**
 
 Run: `npx vitest run test/gmail/process.test.ts`
 Expected: FAIL, `../../src/gmail/process.js` not found.
 
-- [ ] **Step 3: Implement `src/gmail/process.ts`**
+- [x] **Step 3: Implement `src/gmail/process.ts`**
 
 ```ts
 import type { Deps, SyncResult } from "../ports.js";
@@ -2124,12 +2124,12 @@ export async function triageRecord(ctx: ProcessCtx, record: EmailRecord, parsed:
 }
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `npx vitest run test/gmail/process.test.ts && npm run typecheck`
 Expected: 12 passed (the `it.each` counts as 4).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/gmail/process.ts test/gmail/process.test.ts
@@ -2152,7 +2152,7 @@ git commit -m "feat(gmail): process one email into record, items and alert candi
   - `searchEmails(ctx, query, opts?: { account?: AccountId; limit?: number }): Promise<EmailSearchHit[]>`. `limit` defaults to 10 and is clamped to 1..25. Results are newest first. Accounts without a token, or with an error, are skipped.
   - `readEmail(ctx, emailId): Promise<ParsedEmail | null>`. It uses the stored record's account, or else tries both accounts. A 404 or 400 means `null`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `test/gmail/watch.test.ts`:
 ```ts
@@ -2285,12 +2285,12 @@ describe("readEmail", () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests to confirm they fail**
+- [x] **Step 2: Run the tests to confirm they fail**
 
 Run: `npx vitest run test/gmail/watch.test.ts test/gmail/lookup.test.ts`
 Expected: FAIL, modules not found.
 
-- [ ] **Step 3: Implement `src/gmail/watch.ts`**
+- [x] **Step 3: Implement `src/gmail/watch.ts`**
 
 ```ts
 import type { AccountId } from "../types.js";
@@ -2325,7 +2325,7 @@ export async function renewWatch(ctx: GmailCtx, account: AccountId): Promise<voi
 }
 ```
 
-- [ ] **Step 4: Implement `src/gmail/lookup.ts`**
+- [x] **Step 4: Implement `src/gmail/lookup.ts`**
 
 ```ts
 import { ACCOUNT_IDS, type AccountId, type EmailSearchHit, type ParsedEmail } from "../types.js";
@@ -2379,12 +2379,12 @@ export async function readEmail(ctx: GmailCtx, emailId: string): Promise<ParsedE
 }
 ```
 
-- [ ] **Step 5: Run the tests**
+- [x] **Step 5: Run the tests**
 
 Run: `npx vitest run test/gmail/watch.test.ts test/gmail/lookup.test.ts && npm run typecheck`
 Expected: 9 passed (4 + 5).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/gmail/watch.ts src/gmail/lookup.ts test/gmail/watch.test.ts test/gmail/lookup.test.ts
@@ -2413,7 +2413,7 @@ Behaviour:
 - **`retryPendingTriage(limit = 20)`** re-fetches each pending email (a 404 marks it `skipped`) and calls `triageRecord`.
 - **`renewWatchIfNeeded`**, **`search`** and **`read`** delegate to Task 7.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `test/gmail/sync.test.ts`:
 ```ts
@@ -2655,12 +2655,12 @@ describe("handlePush and delegation", () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests to confirm they fail**
+- [x] **Step 2: Run the tests to confirm they fail**
 
 Run: `npx vitest run test/gmail/sync.test.ts`
 Expected: FAIL, `../../src/gmail/sync.js` not found.
 
-- [ ] **Step 3: Implement `src/gmail/sync.ts`**
+- [x] **Step 3: Implement `src/gmail/sync.ts`**
 
 ```ts
 import { ACCOUNT_IDS, type AccountId, type Item } from "../types.js";
@@ -2849,12 +2849,12 @@ export function createMailService(
 }
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `npx vitest run test/gmail && npm run typecheck`
 Expected: every `test/gmail` file passes. That's sync 15, plus api 9, fake-gmail 2, parse 10, account 5, process 12, watch 4 and lookup 5, for 62 in total.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/gmail/sync.ts test/gmail/sync.test.ts
@@ -2877,7 +2877,7 @@ git commit -m "feat(gmail): MailService (history sync, fallback, retries, revoke
 
 The OIDC audience is `PUBLIC_BASE_URL + "/webhooks/gmail"`, and the service account is `INVOKER_SERVICE_ACCOUNT` (plan 00's `oidcPreHandler`). Plan 06 must create the push subscription with that audience. The route **always replies 204** once authenticated, even on malformed bodies and sync errors, because the 5-minute tick catch-up is the safety net and a non-2xx response would only make Pub/Sub retry.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `test/gmail/routes.test.ts`:
 ```ts
@@ -2972,12 +2972,12 @@ describe("POST /webhooks/gmail", () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests to confirm they fail**
+- [x] **Step 2: Run the tests to confirm they fail**
 
 Run: `npx vitest run test/gmail/routes.test.ts`
 Expected: FAIL, `../../src/gmail/routes.js` not found.
 
-- [ ] **Step 3: Implement `src/gmail/routes.ts`**
+- [x] **Step 3: Implement `src/gmail/routes.ts`**
 
 ```ts
 import { z } from "zod";
@@ -3050,12 +3050,12 @@ export const registerGmailRoutes: RouteRegistrar = (app, deps) => {
 };
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `npx vitest run test/gmail/routes.test.ts && npm run typecheck`
 Expected: 6 passed.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/gmail/routes.ts test/gmail/routes.test.ts
@@ -3081,7 +3081,7 @@ git commit -m "feat(gmail): Pub/Sub push webhook with OIDC and idempotency"
   - The npm scripts `eval:triage` and `export:fixtures`
   - Fixture file format (`evals/triage/fixtures/<account>-<gmailId>.json`, gitignored): `{ "id": string, "parsed": ParsedEmail, "now"?: ISO }`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `test/evals/score.test.ts`:
 ```ts
@@ -3199,12 +3199,12 @@ describe("redact", () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests to confirm they fail**
+- [x] **Step 2: Run the tests to confirm they fail**
 
 Run: `npx vitest run test/evals`
 Expected: FAIL, `../../evals/triage/score.js` and `../../evals/triage/redact.js` not found.
 
-- [ ] **Step 3: Implement `evals/triage/score.ts`**
+- [x] **Step 3: Implement `evals/triage/score.ts`**
 
 ```ts
 import { toUtcIso } from "../../src/lib/clock.js";
@@ -3315,7 +3315,7 @@ export function formatReport(r: EvalReport): string {
 }
 ```
 
-- [ ] **Step 4: Implement `evals/triage/redact.ts`**
+- [x] **Step 4: Implement `evals/triage/redact.ts`**
 
 ```ts
 import type { ParsedEmail } from "../../src/types.js";
@@ -3348,12 +3348,12 @@ export function redactParsed(p: ParsedEmail): ParsedEmail {
 }
 ```
 
-- [ ] **Step 5: Run the unit tests**
+- [x] **Step 5: Run the unit tests**
 
 Run: `npx vitest run test/evals && npm run typecheck`
 Expected: 9 passed (6 + 3).
 
-- [ ] **Step 6: Implement `evals/triage/run.ts`**
+- [x] **Step 6: Implement `evals/triage/run.ts`**
 
 ```ts
 import { readdir, readFile } from "node:fs/promises";
@@ -3416,7 +3416,7 @@ async function main(): Promise<number> {
 process.exitCode = await main();
 ```
 
-- [ ] **Step 7: Implement `scripts/export-fixtures.ts`**
+- [x] **Step 7: Implement `scripts/export-fixtures.ts`**
 
 ```ts
 import { mkdir, readFile, writeFile } from "node:fs/promises";
@@ -3460,7 +3460,7 @@ await writeFile(labelsPath, `${JSON.stringify(labels, null, 2)}\n`);
 console.log(`\nWrote fixtures to ${fixturesDir}. Now redact by hand and label them in ${labelsPath}.`);
 ```
 
-- [ ] **Step 8: Write `evals/triage/labels.example.json`**
+- [x] **Step 8: Write `evals/triage/labels.example.json`**
 
 ```json
 {
@@ -3491,7 +3491,7 @@ console.log(`\nWrote fixtures to ${fixturesDir}. Now redact by hand and label th
 }
 ```
 
-- [ ] **Step 9: Write `evals/triage/README.md`**
+- [x] **Step 9: Write `evals/triage/README.md`**
 
 ````markdown
 # Triage eval
@@ -3535,7 +3535,7 @@ Each email is triaged as if it were processed 5 minutes after it arrived. Add `"
 If an urgent item is missed, fix the prompt in `src/triage/prompt.ts` (not the label, unless the label was wrong) and rerun until it passes.
 ````
 
-- [ ] **Step 10: Add the npm scripts**
+- [x] **Step 10: Add the npm scripts**
 
 In `package.json`, add these two entries to `"scripts"`, after `"typecheck"`:
 ```json
@@ -3544,7 +3544,7 @@ In `package.json`, add these two entries to `"scripts"`, after `"typecheck"`:
     "export:fixtures": "tsx --env-file=.env scripts/export-fixtures.ts"
 ```
 
-- [ ] **Step 11: Check everything**
+- [x] **Step 11: Check everything**
 
 Run: `npm test && npm run typecheck`
 Expected: the whole suite passes (plan 00's tests plus 95 from this plan), and typecheck exits 0. This includes `evals/triage/run.ts` and `scripts/export-fixtures.ts`.
@@ -3555,7 +3555,7 @@ Expected, with no fixtures yet: `No fixtures in …/evals/triage/fixtures. See e
 Run: `git check-ignore evals/triage/fixtures/x.json evals/triage/labels.json`
 Expected: both paths are printed, so they're ignored.
 
-- [ ] **Step 12: Commit**
+- [x] **Step 12: Commit**
 
 ```bash
 git add evals/triage/score.ts evals/triage/redact.ts evals/triage/run.ts evals/triage/labels.example.json evals/triage/README.md scripts/export-fixtures.ts package.json test/evals

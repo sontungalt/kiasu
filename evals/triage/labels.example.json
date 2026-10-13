@@ -1,0 +1,26 @@
+{
+  "school-18f2a3b4c5d6e7f8": {
+    "labelled": true,
+    "category": "school_admin",
+    "importance": "high",
+    "expectUrgent": true,
+    "deadlines": [{ "match": "consent form", "dueAt": "2026-10-17T23:59:00+08:00" }],
+    "notes": "Mr Tan asks for the CCA consent form by Friday"
+  },
+  "school-18f2a3b4c5d6e7f9": {
+    "labelled": true,
+    "category": "exam_test",
+    "importance": "high",
+    "expectUrgent": true,
+    "deadlines": [],
+    "notes": "Thursday's chem test moved to Friday (schedule change)"
+  },
+  "personal-18f2a3b4c5d6e7fa": {
+    "labelled": true,
+    "category": "finance_receipt",
+    "importance": "low",
+    "expectUrgent": false,
+    "deadlines": [],
+    "notes": "Card statement ready"
+  }
+}
