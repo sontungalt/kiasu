@@ -1288,7 +1288,7 @@ git commit -m "feat(classroom): UTC due-date conversion and paginated Classroom 
 
 This extractor is self-contained on purpose. Plan 01 owns email triage, so nothing is imported from `src/triage/*`.
 
-- [ ] **Step 1: Write the fake Anthropic test helper**
+- [x] **Step 1: Write the fake Anthropic test helper**
 
 `test/classroom/fake-anthropic.ts`:
 ```ts
@@ -1330,7 +1330,7 @@ export function fakeAnthropic(handler: (body: Record<string, any>) => FakeReply)
 export const jsonReply = (value: unknown): FakeReply => ({ text: JSON.stringify(value) });
 ```
 
-- [ ] **Step 2: Write the failing test**
+- [x] **Step 2: Write the failing test**
 
 `test/classroom/announcement.test.ts`:
 ```ts
@@ -1415,12 +1415,12 @@ describe("normaliseModelDate", () => {
 });
 ```
 
-- [ ] **Step 3: Run the test to confirm it fails**
+- [x] **Step 3: Run the test to confirm it fails**
 
 Run: `npx vitest run test/classroom/announcement.test.ts`
 Expected: FAIL with "Cannot find module '../../src/classroom/announcement.js'".
 
-- [ ] **Step 4: Implement `src/classroom/announcement.ts`**
+- [x] **Step 4: Implement `src/classroom/announcement.ts`**
 
 ```ts
 import { z } from "zod";
@@ -1532,13 +1532,13 @@ export async function extractAnnouncement(
 }
 ```
 
-- [ ] **Step 5: Run the tests**
+- [x] **Step 5: Run the tests**
 
 Run: `npx vitest run test/classroom/announcement.test.ts && npm run typecheck`
 Expected: PASS, 6 tests, and typecheck exits 0.
 If "returns null on a refusal" fails because `messages.parse` returns non-null `parsed_output` for an empty refusal body, the `stop_reason` check above still returns `null`. If it fails another way, check the SDK's refusal shape in `node_modules/@anthropic-ai/sdk` and keep the `stop_reason === "refusal"` check first.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/classroom/announcement.ts test/classroom/fake-anthropic.ts test/classroom/announcement.test.ts
