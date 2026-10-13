@@ -189,3 +189,38 @@ describe("outbox", () => {
     expect(await outbox.flush()).toBe(1);
   });
 });
+
+describe("outbox with alwaysOpen (Telegram: no 24h window)", () => {
+  let deps: TestDeps;
+  let wa: ReturnType<typeof fakeWhatsApp>;
+
+  beforeEach(() => {
+    wa = fakeWhatsApp();
+    deps = makeTestDeps({ whatsapp: wa.client });
+  });
+
+  it("sends free text even though I never messaged, and never sends a template", async () => {
+    const outbox = createOutbox(deps, { alwaysOpen: true });
+    expect(await outbox.deliver(msg("Good morning!", { name: "brief_ready", params: ["morning", "1", "0"] }))).toBe("sent");
+    expect(wa.sent).toEqual(["text:Good morning!"]);
+    expect(await deps.store.state.get("whatsapp")).toBeNull();
+  });
+
+  it("a failed send stays pending without a template, and the next flush sends it", async () => {
+    const outbox = createOutbox(deps, { alwaysOpen: true });
+    wa.failures.push(serverError());
+    expect(await outbox.deliver(msg("alert"))).toBe("queued");
+    expect(wa.sent).toEqual([]);
+    const [pending] = await deps.store.outbox.listPending();
+    expect(pending).toMatchObject({ text: "alert", attempts: 1 });
+    expect(pending!.lastError?.startsWith(TEMPLATE_FAILED)).toBe(false);
+    deps.clock.advance(10 * MIN);
+    expect(await outbox.flush()).toBe(1);
+    expect(wa.sent).toEqual(["text:alert"]);
+  });
+
+  it("without the option the old behaviour holds (window closed: template)", async () => {
+    expect(await createOutbox(deps, {}).deliver(msg("x"))).toBe("queued");
+    expect(wa.sent).toEqual(["template:heads_up"]);
+  });
+});
