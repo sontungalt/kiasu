@@ -102,7 +102,7 @@ describe("tick", () => {
     expect(outbox.sent.map((m) => m.kind)).toEqual(["morning"]);
     expect(outbox.sent[0]?.text).toContain("*Good morning! Thu 15 Oct* ☀️");
     expect(outbox.sent[0]?.text).toContain("*🌙 Came in overnight*\n1. Camp form · Mr Tan");
-    expect((await deps.store.items.get(camp.id))?.alertedAt).toBe("2026-10-14T22:29:59.999Z") // just before 06:30, see maybeSendBrief;
+    expect((await deps.store.items.get(camp.id))?.alertedAt).toBe("2026-10-14T22:29:59.999Z"); // just before 06:30, see maybeSendBrief
   });
 
   it("reminders fire even in quiet hours and are marked sent", async () => {
