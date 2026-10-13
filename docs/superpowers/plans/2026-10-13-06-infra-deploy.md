@@ -90,7 +90,7 @@ test/scripts/*.test.ts, test/infra/*.test.ts, test/main.test.ts
   - `scripts/lib/access.ts`: `type ApiName = "gmail" | "calendar" | "classroom"`, `type AccessKind = "ok" | "invalid_grant" | "scope_missing" | "api_not_enabled" | "blocked_by_admin" | "other"`, `interface AccessResult { api; kind; status: number | null; reason: string }`, `okResult(api)`, `classifyGoogleError(api, err)`, `formatResult(r)`, `adviceFor(account, results): string[]`.
   - npm scripts `auth` and `check:access`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `test/infra/agents-md.test.ts`:
 ```ts
@@ -318,12 +318,12 @@ describe("adviceFor / formatResult", () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests to confirm they fail**
+- [x] **Step 2: Run the tests to confirm they fail**
 
 Run: `npx vitest run test/infra/agents-md.test.ts test/scripts`
 Expected: FAIL. `AGENTS.md` doesn't exist (ENOENT), and the `scripts/lib/*.js` modules aren't found.
 
-- [ ] **Step 3: Write `AGENTS.md` and `CLAUDE.md`**
+- [x] **Step 3: Write `AGENTS.md` and `CLAUDE.md`**
 
 `AGENTS.md`:
 ````markdown
@@ -368,7 +368,7 @@ Tick each step (`- [x]`) as you finish it. Don't skip steps or reorder tasks.
 Everything for coding agents is in `AGENTS.md` (imported above). Read it first, then `docs/build-prompt.md`.
 ```
 
-- [ ] **Step 4: Implement `scripts/lib/secrets.ts`**
+- [x] **Step 4: Implement `scripts/lib/secrets.ts`**
 
 ```ts
 import { spawn } from "node:child_process";
@@ -458,7 +458,7 @@ export async function fillFromSecretManager(
 }
 ```
 
-- [ ] **Step 5: Implement `scripts/lib/oauth.ts`**
+- [x] **Step 5: Implement `scripts/lib/oauth.ts`**
 
 ```ts
 /** Pure helpers for scripts/auth-google.ts. */
@@ -548,7 +548,7 @@ export function readCallback(url: URL, expectedState: string): CallbackResult {
 }
 ```
 
-- [ ] **Step 6: Implement `scripts/lib/access.ts`**
+- [x] **Step 6: Implement `scripts/lib/access.ts`**
 
 ```ts
 /** Pure classification of Google API probe results for scripts/check-access.ts (spec §13 step 0). */
@@ -657,12 +657,12 @@ export function adviceFor(account: AccountId, results: AccessResult[]): string[]
 }
 ```
 
-- [ ] **Step 7: Run the unit tests**
+- [x] **Step 7: Run the unit tests**
 
 Run: `npx vitest run test/infra/agents-md.test.ts test/scripts && npm run typecheck`
 Expected: PASS. That's 3 tests in agents-md, 6 in secrets, 7 in oauth and 10 in access. Typecheck exits 0.
 
-- [ ] **Step 8: Write `scripts/auth-google.ts`**
+- [x] **Step 8: Write `scripts/auth-google.ts`**
 
 ```ts
 /**
@@ -787,7 +787,7 @@ main().then(
 );
 ```
 
-- [ ] **Step 9: Write `scripts/check-access.ts`**
+- [x] **Step 9: Write `scripts/check-access.ts`**
 
 ```ts
 /**
@@ -865,7 +865,7 @@ main().then(
 );
 ```
 
-- [ ] **Step 10: Add the npm scripts and the package name**
+- [x] **Step 10: Add the npm scripts and the package name**
 
 Run:
 ```bash
@@ -876,7 +876,7 @@ npm pkg get name scripts.auth "scripts.check:access"
 ```
 Expected: the last command prints the three values above.
 
-- [ ] **Step 11: Write `docs/setup.md` (part 1: Google Cloud + OAuth + Step 0)**
+- [x] **Step 11: Write `docs/setup.md` (part 1: Google Cloud + OAuth + Step 0)**
 
 ````markdown
 # kiasu-assistant setup
@@ -956,7 +956,7 @@ Fallbacks, in order (spec §13):
   is outside v1, so raise it with the coordinator before building it.
 ````
 
-- [ ] **Step 12: Run Step 0 for real (manual)**
+- [ ] (user) **Step 12: Run Step 0 for real (manual)**
 
 Do docs/setup.md steps 0–5 now, then fill in the table in step 6.
 Expected for `npm run check:access -- personal`:
@@ -969,12 +969,12 @@ All good: the personal account can reach Gmail, Calendar and Classroom.
 ```
 For school, either the same or one of the advice lines. Record the outcome in the step 6 table. If school Gmail is ❌, stop and report to the coordinator. Plans 01–05 can continue on the personal account.
 
-- [ ] **Step 13: Full suite**
+- [x] **Step 13: Full suite**
 
 Run: `npm test && npm run typecheck`
 Expected: all tests pass, and typecheck exits 0.
 
-- [ ] **Step 14: Commit**
+- [x] **Step 14: Commit**
 
 ```bash
 git add AGENTS.md CLAUDE.md scripts/lib/secrets.ts scripts/lib/oauth.ts scripts/lib/access.ts \

@@ -11,7 +11,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:firestore": "FIRESTORE_EMULATOR_HOST=127.0.0.1:8085 GCP_PROJECT=demo-inbox vitest run test/store",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "auth": "tsx --env-file=.env scripts/auth-google.ts",
+    "check:access": "tsx --env-file=.env scripts/check-access.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",
