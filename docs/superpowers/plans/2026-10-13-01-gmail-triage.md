@@ -1385,7 +1385,7 @@ git commit -m "feat(triage): Zod schema, structured-output JSON schema and promp
   - `normaliseIso(value: string | null, kind: "due" | "start"): string | null`, `normaliseTriage(raw: TriageResult): TriageResult`
   - Re-exports `TriageSchema` and `type TriageResult`, `type TriageItem`. Other plans import them from `src/triage/triage.js`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `test/triage/triage.test.ts`:
 ```ts
@@ -1512,12 +1512,12 @@ describe("normaliseIso", () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests to confirm they fail**
+- [x] **Step 2: Run the tests to confirm they fail**
 
 Run: `npx vitest run test/triage/triage.test.ts`
 Expected: FAIL, `../../src/triage/triage.js` not found.
 
-- [ ] **Step 3: Implement `src/triage/triage.ts`**
+- [x] **Step 3: Implement `src/triage/triage.ts`**
 
 ```ts
 import type Anthropic from "@anthropic-ai/sdk";
@@ -1623,12 +1623,12 @@ export async function triageEmail(
 }
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `npx vitest run test/triage && npm run typecheck`
 Expected: 18 passed (triage 8, plus schema 4 and prompt 6 from Task 3).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/triage/triage.ts test/triage/triage.test.ts
