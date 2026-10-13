@@ -3081,7 +3081,7 @@ git commit -m "feat(gmail): Pub/Sub push webhook with OIDC and idempotency"
   - The npm scripts `eval:triage` and `export:fixtures`
   - Fixture file format (`evals/triage/fixtures/<account>-<gmailId>.json`, gitignored): `{ "id": string, "parsed": ParsedEmail, "now"?: ISO }`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `test/evals/score.test.ts`:
 ```ts
@@ -3199,12 +3199,12 @@ describe("redact", () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests to confirm they fail**
+- [x] **Step 2: Run the tests to confirm they fail**
 
 Run: `npx vitest run test/evals`
 Expected: FAIL, `../../evals/triage/score.js` and `../../evals/triage/redact.js` not found.
 
-- [ ] **Step 3: Implement `evals/triage/score.ts`**
+- [x] **Step 3: Implement `evals/triage/score.ts`**
 
 ```ts
 import { toUtcIso } from "../../src/lib/clock.js";
@@ -3315,7 +3315,7 @@ export function formatReport(r: EvalReport): string {
 }
 ```
 
-- [ ] **Step 4: Implement `evals/triage/redact.ts`**
+- [x] **Step 4: Implement `evals/triage/redact.ts`**
 
 ```ts
 import type { ParsedEmail } from "../../src/types.js";
@@ -3348,12 +3348,12 @@ export function redactParsed(p: ParsedEmail): ParsedEmail {
 }
 ```
 
-- [ ] **Step 5: Run the unit tests**
+- [x] **Step 5: Run the unit tests**
 
 Run: `npx vitest run test/evals && npm run typecheck`
 Expected: 9 passed (6 + 3).
 
-- [ ] **Step 6: Implement `evals/triage/run.ts`**
+- [x] **Step 6: Implement `evals/triage/run.ts`**
 
 ```ts
 import { readdir, readFile } from "node:fs/promises";
@@ -3416,7 +3416,7 @@ async function main(): Promise<number> {
 process.exitCode = await main();
 ```
 
-- [ ] **Step 7: Implement `scripts/export-fixtures.ts`**
+- [x] **Step 7: Implement `scripts/export-fixtures.ts`**
 
 ```ts
 import { mkdir, readFile, writeFile } from "node:fs/promises";
@@ -3460,7 +3460,7 @@ await writeFile(labelsPath, `${JSON.stringify(labels, null, 2)}\n`);
 console.log(`\nWrote fixtures to ${fixturesDir}. Now redact by hand and label them in ${labelsPath}.`);
 ```
 
-- [ ] **Step 8: Write `evals/triage/labels.example.json`**
+- [x] **Step 8: Write `evals/triage/labels.example.json`**
 
 ```json
 {
@@ -3491,7 +3491,7 @@ console.log(`\nWrote fixtures to ${fixturesDir}. Now redact by hand and label th
 }
 ```
 
-- [ ] **Step 9: Write `evals/triage/README.md`**
+- [x] **Step 9: Write `evals/triage/README.md`**
 
 ````markdown
 # Triage eval
@@ -3535,7 +3535,7 @@ Each email is triaged as if it were processed 5 minutes after it arrived. Add `"
 If an urgent item is missed, fix the prompt in `src/triage/prompt.ts` (not the label, unless the label was wrong) and rerun until it passes.
 ````
 
-- [ ] **Step 10: Add the npm scripts**
+- [x] **Step 10: Add the npm scripts**
 
 In `package.json`, add these two entries to `"scripts"`, after `"typecheck"`:
 ```json
@@ -3544,7 +3544,7 @@ In `package.json`, add these two entries to `"scripts"`, after `"typecheck"`:
     "export:fixtures": "tsx --env-file=.env scripts/export-fixtures.ts"
 ```
 
-- [ ] **Step 11: Check everything**
+- [x] **Step 11: Check everything**
 
 Run: `npm test && npm run typecheck`
 Expected: the whole suite passes (plan 00's tests plus 95 from this plan), and typecheck exits 0. This includes `evals/triage/run.ts` and `scripts/export-fixtures.ts`.
@@ -3555,7 +3555,7 @@ Expected, with no fixtures yet: `No fixtures in …/evals/triage/fixtures. See e
 Run: `git check-ignore evals/triage/fixtures/x.json evals/triage/labels.json`
 Expected: both paths are printed, so they're ignored.
 
-- [ ] **Step 12: Commit**
+- [x] **Step 12: Commit**
 
 ```bash
 git add evals/triage/score.ts evals/triage/redact.ts evals/triage/run.ts evals/triage/labels.example.json evals/triage/README.md scripts/export-fixtures.ts package.json test/evals
