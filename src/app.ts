@@ -39,6 +39,13 @@ export function chooseStoreKind(config: Pick<Config, "NODE_ENV">, env: Record<st
   throw new Error(`STORE must be "firestore" or "memory", got "${env.STORE}"`);
 }
 
+export type TaskQueueKind = "inline" | "cloud";
+
+/** In-process queue for local dev and for hosts without Cloud Tasks (Render); Cloud Tasks otherwise. */
+export function chooseTaskQueueKind(config: Pick<Config, "DEV_SKIP_OIDC" | "TASKS_QUEUE">): TaskQueueKind {
+  return config.DEV_SKIP_OIDC || !config.TASKS_QUEUE ? "inline" : "cloud";
+}
+
 export interface BuildOptions {
   env?: Record<string, string | undefined>;
   /** Replace any built dependency (tests, scripts). */
@@ -56,7 +63,7 @@ export function buildDeps(config: Config, opts: BuildOptions = {}): { deps: Deps
     store = o.store;
   } else {
     const kind = chooseStoreKind(config, env);
-    store = kind === "memory" ? new MemoryStore() : new FirestoreStore(createFirestore(config.GCP_PROJECT));
+    store = kind === "memory" ? new MemoryStore() : new FirestoreStore(createFirestore(config.GCP_PROJECT, config.FIRESTORE_CREDENTIALS_JSON));
     log.info("store selected", { kind });
   }
   const anthropic = o.anthropic ?? new Anthropic({ apiKey: config.ANTHROPIC_API_KEY });
@@ -69,12 +76,14 @@ export function buildDeps(config: Config, opts: BuildOptions = {}): { deps: Deps
   const agent = o.agent ?? createChatAgent({ config, clock, log, store, anthropic, mail, calendar });
 
   let app: FastifyInstance | null = null;
+  // The inline queue goes through the same authenticated route as Cloud Tasks, so it sends JOB_SECRET.
+  const taskHeaders: Record<string, string> = config.JOB_SECRET ? { authorization: `Bearer ${config.JOB_SECRET}` } : {};
   const tasks =
     o.tasks ??
-    (config.DEV_SKIP_OIDC
+    (chooseTaskQueueKind(config) === "inline"
       ? createInlineTaskQueue(async (msg: InboundMessage) => {
           if (!app) throw new Error("inline task queue used before the app was built");
-          const res = await app.inject({ method: "POST", url: "/tasks/handle-message", payload: { ...msg } });
+          const res = await app.inject({ method: "POST", url: "/tasks/handle-message", headers: taskHeaders, payload: { ...msg } });
           if (res.statusCode >= 400) log.error("inline task failed", { status: res.statusCode, messageId: msg.id });
         }, log)
       : createCloudTaskQueue(config));

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import Anthropic from "@anthropic-ai/sdk";
-import { buildApp, chooseStoreKind, type BuildOptions } from "../src/app.js";
+import { buildApp, buildDeps, chooseStoreKind, chooseTaskQueueKind, type BuildOptions } from "../src/app.js";
 import { loadConfig } from "../src/config.js";
 import { FakeClock } from "../src/lib/clock.js";
 import { silentLogger } from "../src/lib/log.js";
@@ -99,6 +99,36 @@ describe("composition root", () => {
     await deps.tasks.enqueueInbound(msg);
     await vi.waitFor(() => expect(agent.reply).toHaveBeenCalledWith("ping"));
     await app.close();
+  });
+});
+
+describe("free hosting wiring", () => {
+  const JOB_SECRET = "j".repeat(40);
+
+  it("without TASKS_QUEUE the in-process queue calls /tasks/handle-message with JOB_SECRET", async () => {
+    const agent: ChatAgent = { reply: vi.fn(async () => "pong") };
+    const whatsapp: WhatsAppClient = {
+      sendText: vi.fn(async () => ({ messageId: "w1" })),
+      sendTemplate: vi.fn(async () => ({ messageId: "w2" })),
+    };
+    const { app, deps } = await build({ TASKS_QUEUE: "", JOB_SECRET }, { agent, whatsapp });
+    await deps.tasks.enqueueInbound({
+      id: "tg:1", from: "1", timestamp: "2026-10-14T00:00:00.000Z", type: "text", text: "ping", contextMessageId: null,
+    });
+    await vi.waitFor(() => expect(agent.reply).toHaveBeenCalledWith("ping"));
+    await app.close();
+  });
+
+  it("chooseTaskQueueKind: inline with DEV_SKIP_OIDC or without TASKS_QUEUE, otherwise Cloud Tasks", () => {
+    expect(chooseTaskQueueKind({ DEV_SKIP_OIDC: true, TASKS_QUEUE: "q" })).toBe("inline");
+    expect(chooseTaskQueueKind({ DEV_SKIP_OIDC: false, TASKS_QUEUE: undefined })).toBe("inline");
+    expect(chooseTaskQueueKind({ DEV_SKIP_OIDC: false, TASKS_QUEUE: "q" })).toBe("cloud");
+  });
+
+  it("passes FIRESTORE_CREDENTIALS_JSON to Firestore", () => {
+    const config = loadConfig({ ...TEST_ENV, FIRESTORE_CREDENTIALS_JSON: "not json" });
+    expect(() => buildDeps(config, { env: { STORE: "firestore" }, overrides: { log: silentLogger } }))
+      .toThrow(/FIRESTORE_CREDENTIALS_JSON is not valid JSON/);
   });
 });
 
