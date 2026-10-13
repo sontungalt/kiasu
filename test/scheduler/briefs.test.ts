@@ -70,7 +70,20 @@ describe("maybeSendBrief", () => {
     expect(await maybeSendBrief(deps, "morning", at(WED_0630))).toBe("ok");
     expect(outbox.sent[0]?.text).toContain("*🌙 Came in overnight*\n1. Camp form · Mr Tan");
     expect(outbox.sent[0]?.template.params).toEqual(["Wed", "0", "1"]);
-    expect((await deps.store.items.get(camp.id))?.alertedAt).toBe(WED_0630);
+    // Timestamped just before the 06:30 boundary, so the evening's "Urgent since this morning" won't repeat it.
+    expect((await deps.store.items.get(camp.id))?.alertedAt).toBe("2026-10-13T22:29:59.999Z");
     expect(await heldAlertIds(deps.store)).toEqual([]);
+  });
+
+  it("does not repeat overnight alerts in that evening's urgent section", async () => {
+    const { deps, outbox } = makeSchedulerDeps(WED_0630);
+    const camp = await deps.store.items.create(makeItem({
+      title: "Camp form", urgency: "urgent", dedupeKey: "camp", createdAt: "2026-10-13T16:00:00.000Z", // Wed 00:00 SGT
+    }));
+    await addHeldAlerts(deps.store, [camp.id]);
+    expect(await maybeSendBrief(deps, "morning", at(WED_0630))).toBe("ok");
+    expect(await maybeSendBrief(deps, "evening", at("2026-10-14T13:00:00.000Z"))).toBe("ok"); // Wed 21:00 SGT
+    const evening = outbox.sent.find((m) => m.kind === "evening");
+    expect(evening?.text).not.toContain("Camp form");
   });
 });

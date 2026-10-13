@@ -44,7 +44,10 @@ export async function maybeSendBrief(
   await deps.outbox.deliver({ kind, text: brief.text, template: brief.template });
   await store.state.set("lastList", { at: nowIso, map: brief.numbering });
   await markBriefDone(store, kind, today);
-  await markAlerted(store, input.overnightAlerts.map((i) => i.id), nowIso);
+  // Overnight alerts are covered by this brief. Stamp them just before the scheduled morning time so the
+  // evening's "Urgent since this morning" (alertedAt >= today's morningAt) doesn't repeat them.
+  const overnightStamp = kind === "morning" ? new Date(scheduled.getTime() - 1).toISOString() : nowIso;
+  await markAlerted(store, input.overnightAlerts.map((i) => i.id), overnightStamp);
   await pruneHeldAlerts(store);
   deps.log.info("brief sent", { kind, date: today, ...brief.counts });
   return "ok";
