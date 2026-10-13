@@ -2134,7 +2134,7 @@ Behavior:
 - When `config.DEV_SKIP_OIDC` is true, `?now=<ISO>` sets the time. The route builds a copy of `deps` with a fixed clock and a fresh notifier bound to that clock, then runs `tick(devDeps, at)`. An invalid `now` returns 400. Without `DEV_SKIP_OIDC`, `?now` is ignored.
 - The route never reads a body. Cloud Scheduler may send an empty body with `Content-Type: application/json`, which Fastify's default JSON parser rejects. So this encapsulated scope replaces the body parsers with a catch-all that ignores the body.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `test/scheduler/routes.test.ts`:
 ```ts
@@ -2199,12 +2199,12 @@ describe("POST /jobs/tick", () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to confirm it fails**
+- [x] **Step 2: Run the test to confirm it fails**
 
 Run: `npx vitest run test/scheduler/routes.test.ts`
 Expected: FAIL, because `../../src/scheduler/routes.js` can't be resolved.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 `src/scheduler/routes.ts`:
 ```ts
@@ -2238,12 +2238,12 @@ export function jobRoutes(verify?: IdTokenVerifier): RouteRegistrar {
 export const registerJobRoutes: RouteRegistrar = jobRoutes();
 ```
 
-- [ ] **Step 4: Run the full suite**
+- [x] **Step 4: Run the full suite**
 
 Run: `npm test && npm run typecheck`
 Expected: every test passes (`routes.test.ts`: 5 passed), the Firestore suite is skipped without the emulator, and typecheck exits 0.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/scheduler/routes.ts test/scheduler/routes.test.ts
