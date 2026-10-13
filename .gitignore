@@ -7,3 +7,6 @@ evals/triage/fixtures/
 evals/triage/labels.json
 .DS_Store
 .claude/
+# Firebase / Google service-account keys (paste into Render as FIRESTORE_CREDENTIALS_JSON, never commit)
+*-firebase-adminsdk-*.json
+service-account*.json

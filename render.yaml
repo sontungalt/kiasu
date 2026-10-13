@@ -1,0 +1,51 @@
+# Render Blueprint for the no-card hosting setup (docs/setup-free.md).
+# Spec: https://render.com/docs/blueprint-spec
+# Values marked `sync: false` are asked for once, when the Blueprint is first created. Render ignores them
+# on later syncs, so add any new secret by hand in the dashboard (Environment tab).
+services:
+  - type: web
+    name: kiasu-assistant
+    runtime: node
+    plan: free
+    region: singapore
+    # NODE_ENV=production makes npm skip devDependencies, but the build needs TypeScript.
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: node dist/main.js
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MESSENGER
+        value: telegram
+      - key: TRIAGE_MODEL
+        value: claude-haiku-5-5
+      - key: CHAT_MODEL
+        value: claude-sonnet-5-5
+      - key: GCP_REGION
+        value: asia-southeast1
+      - key: GCP_PROJECT
+        sync: false
+      - key: PUBLIC_BASE_URL
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: GOOGLE_OAUTH_CLIENT_ID
+        sync: false
+      - key: GOOGLE_OAUTH_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REFRESH_TOKEN_PERSONAL
+        sync: false
+      - key: GOOGLE_REFRESH_TOKEN_SCHOOL
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_CHAT_ID
+        sync: false
+      - key: TELEGRAM_WEBHOOK_SECRET
+        sync: false
+      - key: JOB_SECRET
+        sync: false
+      - key: FIRESTORE_CREDENTIALS_JSON
+        sync: false
+      - key: CLASSROOM_ENABLED
+        sync: false

@@ -36,6 +36,17 @@ Sending, replying to, deleting or forwarding emails. Voice notes and images. Tim
 
 ## 3. Key decisions
 
+*Change 2026-10-13: Telegram + no-card hosting.* I'm a student and can't use Google Cloud billing (it needs a card hold)
+or Meta WhatsApp (Meta now requires a registered, verified business even for the test number). So the default setup is now:
+- **Messaging via a Telegram bot** (`MESSENGER=telegram`). Telegram has no 24h window or templates, so the outbox always
+  sends free text. The WhatsApp code stays and is selected with `MESSENGER=whatsapp`.
+- **Hosting without a card:** a Render free web service (`render.yaml`); cron-job.org calls `POST /jobs/tick` every
+  5 minutes with `Authorization: Bearer <JOB_SECRET>` (Google OIDC is only checked when `INVOKER_SERVICE_ACCOUNT` is set);
+  Firestore on Firebase's free Spark plan with a service-account key in `FIRESTORE_CREDENTIALS_JSON`; Gmail is **polled**
+  in the tick (no `GMAIL_PUBSUB_TOPIC`, so no `users.watch`), so new mail takes up to about 5 minutes instead of about 1;
+  and the in-process task queue replaces Cloud Tasks (no `TASKS_QUEUE`).
+- Runbook: `docs/setup-free.md`. The Cloud Run + WhatsApp design below remains the "with billing" option (`docs/setup.md`).
+
 | Decision | Choice | Why |
 |---|---|---|
 | WhatsApp transport | **Meta WhatsApp Cloud API (official)** | No ban risk. Proactive messages outside the 24h window must use approved templates. |
