@@ -1653,7 +1653,7 @@ git commit -m "feat(triage): triageEmail with structured output, refusal and par
   - `markRevoked(ctx, account): Promise<void>`. Only the `ok` to `revoked` transition sends the notice.
   - `reconnectMessage(account): OutboundMessage`, `blankAccount(id): AccountState`, `getAccount(store, id): Promise<AccountState>`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `test/gmail/account.test.ts`:
 ```ts
@@ -1724,12 +1724,12 @@ describe("withGmail", () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests to confirm they fail**
+- [x] **Step 2: Run the tests to confirm they fail**
 
 Run: `npx vitest run test/gmail/account.test.ts`
 Expected: FAIL, `../../src/gmail/account.js` not found.
 
-- [ ] **Step 3: Implement `src/gmail/account.ts`**
+- [x] **Step 3: Implement `src/gmail/account.ts`**
 
 ```ts
 import type { Deps, OutboundMessage } from "../ports.js";
@@ -1808,12 +1808,12 @@ export async function withGmail<T>(
 }
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `npx vitest run test/gmail/account.test.ts && npm run typecheck`
 Expected: 5 passed.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/gmail/account.ts test/gmail/account.test.ts
