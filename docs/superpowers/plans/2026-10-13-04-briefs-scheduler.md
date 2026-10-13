@@ -1660,7 +1660,7 @@ Rules (§8.5):
 - Otherwise, gather and compose. Then claim `brief:<kind>:<dateKey>` with `store.processed.claim` *right before* delivering. Doing the claim after gather and compose means a gather failure leaves the brief unclaimed, so the next tick retries it. If the claim is lost, return `"skipped"` because another tick is sending it.
 - After delivering: save `numbering` to `state/lastList`, set `state/briefs`, mark the overnight alerts as alerted, and prune the held list.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `test/scheduler/briefs.test.ts`:
 ```ts
@@ -1742,12 +1742,12 @@ describe("maybeSendBrief", () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to confirm it fails**
+- [x] **Step 2: Run the test to confirm it fails**
 
 Run: `npx vitest run test/scheduler/briefs.test.ts`
 Expected: FAIL, because `../../src/scheduler/briefs.js` can't be resolved.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 `src/scheduler/briefs.ts`:
 ```ts
@@ -1804,12 +1804,12 @@ export async function maybeSendBrief(
 }
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `npx vitest run test/scheduler/briefs.test.ts && npm run typecheck`
 Expected: `6 passed`, and typecheck exits 0.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/scheduler/briefs.ts test/scheduler/briefs.test.ts
