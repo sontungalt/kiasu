@@ -412,7 +412,7 @@ Behaviour:
 - Sort by start, with all-day before timed at the same instant and personal before school. Dedupe by lowercase trimmed title plus `startAt`, keeping the first copy.
 - An account failure (including `invalid_grant`) is logged as a warning and that account contributes `[]`. A single calendar failing is logged and skipped.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `test/calendar/service.test.ts`:
 ```ts
@@ -616,12 +616,12 @@ describe("CalendarService.listEvents", () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to confirm it fails**
+- [x] **Step 2: Run the test to confirm it fails**
 
 Run: `npx vitest run test/calendar/service.test.ts`
 Expected: FAIL with "Cannot find module '../../src/calendar/service.js'".
 
-- [ ] **Step 3: Implement `src/calendar/service.ts`**
+- [x] **Step 3: Implement `src/calendar/service.ts`**
 
 ```ts
 import type { CalendarService, Deps } from "../ports.js";
@@ -739,12 +739,12 @@ export function createCalendarService(deps: CalendarDeps, api: CalendarApiFactor
 }
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `npx vitest run test/calendar && npm run typecheck`
 Expected: PASS, 12 tests (3 api + 9 service), and typecheck exits 0.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/calendar/service.ts test/calendar/service.test.ts
