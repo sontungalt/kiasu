@@ -195,7 +195,7 @@ git commit -m "feat(contract): heldAlerts state doc and emails.listFailedSince"
   - `eventLine(e: CalendarEvent): string`, `emailLine(e: EmailRecord): string`, `failedEmailsBlock(emails: EmailRecord[]): string | null`, `moreLine(hidden: number): string`, `weekdayOf(now: Date): string`
 - Test fixtures produced (`test/brief/fixtures.ts`): `MORNING`, `EVENING`, `emailSource(from)`, `classroomSource(courseName)`, `MANUAL`, `item(id, over)`, `email(id, over)`, `event(id, over)`.
 
-- [ ] **Step 1: Write the shared fixtures**
+- [x] **Step 1: Write the shared fixtures**
 
 `test/brief/fixtures.ts`:
 ```ts
@@ -238,7 +238,7 @@ export function event(id: string, over: Partial<CalendarEvent> = {}): CalendarEv
 }
 ```
 
-- [ ] **Step 2: Write the failing test**
+- [x] **Step 2: Write the failing test**
 
 `test/brief/format.test.ts`:
 ```ts
@@ -337,12 +337,12 @@ describe("format helpers", () => {
 });
 ```
 
-- [ ] **Step 3: Run the test to confirm it fails**
+- [x] **Step 3: Run the test to confirm it fails**
 
 Run: `npx vitest run test/brief/format.test.ts`
 Expected: FAIL, because `../../src/brief/format.js` can't be resolved.
 
-- [ ] **Step 4: Implement**
+- [x] **Step 4: Implement**
 
 `src/brief/format.ts`:
 ```ts
@@ -469,12 +469,12 @@ export function weekdayOf(now: Date): string {
 }
 ```
 
-- [ ] **Step 5: Run the tests**
+- [x] **Step 5: Run the tests**
 
 Run: `npx vitest run test/brief/format.test.ts && npm run typecheck`
 Expected: `12 passed`, and typecheck exits 0.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/brief/format.ts test/brief/fixtures.ts test/brief/format.test.ts
