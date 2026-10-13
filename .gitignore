@@ -6,3 +6,4 @@ dist/
 evals/triage/fixtures/
 evals/triage/labels.json
 .DS_Store
+.claude/
