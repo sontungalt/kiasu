@@ -8,4 +8,10 @@ describe("SYSTEM_PROMPT", () => {
     }
     expect(SYSTEM_PROMPT).not.toMatch(/\$\{|\{\{/);
   });
+
+  it("is messenger-neutral: chat formatting works on Telegram (legacy Markdown) and WhatsApp", () => {
+    expect(SYSTEM_PROMPT).toContain("chat formatting (Telegram/WhatsApp)");
+    expect(SYSTEM_PROMPT).not.toContain("WhatsApp formatting");
+    expect(SYSTEM_PROMPT).not.toContain("assistant on WhatsApp");
+  });
 });

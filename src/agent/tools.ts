@@ -172,7 +172,7 @@ export function buildTools(deps: ToolDeps): AgentTool[] {
   const createReminder = betaZodTool({
     name: "create_reminder",
     description:
-      "Create a reminder that the app will send the user on WhatsApp at the given time. " +
+      "Create a reminder that the app will send the user in chat at the given time. " +
       "Resolve the user's natural-language time to ISO first (a clock time with no day means its next occurrence).",
     inputSchema: z.object({
       text: z.string().describe("What to remind the user about, short, e.g. 'Submit the CCA form'."),

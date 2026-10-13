@@ -5,7 +5,7 @@ import {
 } from "./inbound.js";
 
 /** Raises state.whatsapp.lastInboundAt to `atIso` (never lowers it: deliveries can arrive out of order). */
-async function bumpLastInbound(deps: Deps, atIso: string): Promise<void> {
+export async function bumpLastInbound(deps: Pick<Deps, "store">, atIso: string): Promise<void> {
   const cur = await deps.store.state.get("whatsapp");
   if (cur?.lastInboundAt && cur.lastInboundAt >= atIso) return;
   await deps.store.state.set("whatsapp", { ...(cur ?? {}), lastInboundAt: atIso });

@@ -8,7 +8,10 @@ async function main(): Promise<void> {
   const config = loadConfig();
   const { app, deps } = await buildApp(config);
   await app.listen({ host: "0.0.0.0", port: config.PORT });
-  deps.log.info("listening", { port: config.PORT, nodeEnv: config.NODE_ENV, devSkipOidc: config.DEV_SKIP_OIDC });
+  deps.log.info("listening", {
+    port: config.PORT, nodeEnv: config.NODE_ENV, devSkipOidc: config.DEV_SKIP_OIDC,
+    messenger: config.MESSENGER, gmailPush: Boolean(config.GMAIL_PUBSUB_TOPIC), cloudTasks: Boolean(config.TASKS_QUEUE),
+  });
 
   let closing = false;
   const shutdown = (signal: string) => {
