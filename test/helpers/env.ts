@@ -1,0 +1,18 @@
+export const TEST_ENV: Record<string, string> = {
+  NODE_ENV: "test",
+  GCP_PROJECT: "demo-inbox",
+  PUBLIC_BASE_URL: "https://bot.example.com",
+  ANTHROPIC_API_KEY: "sk-ant-test",
+  GOOGLE_OAUTH_CLIENT_ID: "cid",
+  GOOGLE_OAUTH_CLIENT_SECRET: "csecret",
+  GOOGLE_REFRESH_TOKEN_PERSONAL: "rt-personal",
+  GOOGLE_REFRESH_TOKEN_SCHOOL: "rt-school",
+  GMAIL_PUBSUB_TOPIC: "projects/demo-inbox/topics/gmail-push",
+  INVOKER_SERVICE_ACCOUNT: "invoker@demo-inbox.iam.gserviceaccount.com",
+  TASKS_QUEUE: "projects/demo-inbox/locations/asia-southeast1/queues/inbound",
+  WA_PHONE_NUMBER_ID: "123456",
+  WA_ACCESS_TOKEN: "wa-token",
+  WA_APP_SECRET: "wa-secret",
+  WA_VERIFY_TOKEN: "wa-verify",
+  MY_WHATSAPP_NUMBER: "6500000000",
+};
