@@ -809,7 +809,7 @@ git commit -m "feat(brief): morning brief composer with numbering and section ca
 
 Evening layout (§8.2, §7a): header, *🗓 Tomorrow* (events), *🗓 Due tomorrow*, *⏳ Still open from today* (items due today that are still open, including ones already past), *🚨 Urgent since this morning*, health lines and the footer. The urgent section contains held overnight alerts, plus open items that were alerted at or after `sinceIso`, plus open items with `urgency === "urgent"` created at or after `sinceIso`, minus anything already listed. `importantEmails` and `failedEmails` are ignored, because they belong to the morning. The template label is `"<Weekday> evening"`. `counts.dueToday` is the number of items still open from today.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `test/brief/evening.test.ts`:
 ```ts
@@ -893,12 +893,12 @@ describe("composeEvening", () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to confirm it fails**
+- [x] **Step 2: Run the test to confirm it fails**
 
 Run: `npx vitest run test/brief/evening.test.ts`
 Expected: FAIL, because `../../src/brief/evening.js` can't be resolved.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 `src/brief/evening.ts`:
 ```ts
@@ -936,12 +936,12 @@ export function composeEvening(input: BriefInput, now: Date): ComposedBrief {
 }
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `npx vitest run test/brief && npm run typecheck`
 Expected: `21 passed`, and typecheck exits 0.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/brief/evening.ts test/brief/evening.test.ts
