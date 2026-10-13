@@ -1508,7 +1508,7 @@ Rules (§8.4):
 - All due-soon items go into one message, sent with `outbox.deliver({kind:"nudge"})`. Then every candidate gets `nudgedAt = now`, so each item is nudged once.
 - Nudges use bullets, not numbers, and don't overwrite `lastList`. That way a "done 3" that refers to the morning brief keeps working.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `test/scheduler/nudges.test.ts`:
 ```ts
@@ -1578,12 +1578,12 @@ describe("sendNudges", () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to confirm it fails**
+- [x] **Step 2: Run the test to confirm it fails**
 
 Run: `npx vitest run test/scheduler/nudges.test.ts`
 Expected: FAIL, because `../../src/scheduler/nudges.js` can't be resolved.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 `src/scheduler/nudges.ts`:
 ```ts
@@ -1629,12 +1629,12 @@ export async function sendNudges(deps: Pick<Deps, "store" | "outbox" | "log">, n
 }
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `npx vitest run test/scheduler/nudges.test.ts && npm run typecheck`
 Expected: `5 passed`, and typecheck exits 0.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/scheduler/nudges.ts test/scheduler/nudges.test.ts
