@@ -56,6 +56,24 @@ describe("extractAnnouncement", () => {
     expect(await extractAnnouncement(makeTestDeps({ anthropic: fake.client }), INPUT, NOW)).toBeNull();
   });
 
+  it("enforces the urgency enum in the schema sent to the API", async () => {
+    const fake = fakeAnthropic(() => jsonReply({ title: "t", summary: "s", dueAt: null, urgency: "low", urgencyReason: null }));
+    await extractAnnouncement(makeTestDeps({ anthropic: fake.client }), INPUT, NOW);
+    const schema = fake.requests[0]!.output_config.format;
+    expect(schema.type).toBe("json_schema");
+    expect(schema.schema.properties.urgency.enum).toEqual(["urgent", "normal", "low"]);
+  });
+
+  it("returns null on a refusal written as prose", async () => {
+    const fake = fakeAnthropic(() => ({ text: "I can't help with that.", stopReason: "refusal" }));
+    expect(await extractAnnouncement(makeTestDeps({ anthropic: fake.client }), INPUT, NOW)).toBeNull();
+  });
+
+  it("returns null when the output is not valid for the schema", async () => {
+    const fake = fakeAnthropic(() => jsonReply({ title: "t", summary: "s", dueAt: null, urgency: "panic", urgencyReason: null }));
+    expect(await extractAnnouncement(makeTestDeps({ anthropic: fake.client }), INPUT, NOW)).toBeNull();
+  });
+
   it("returns null when the API errors", async () => {
     const fake = fakeAnthropic(() => ({ httpStatus: 500 }));
     expect(await extractAnnouncement(makeTestDeps({ anthropic: fake.client }), INPUT, NOW)).toBeNull();

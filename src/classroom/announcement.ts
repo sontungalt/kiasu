@@ -1,5 +1,6 @@
 import { z } from "zod";
-import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
+import type Anthropic from "@anthropic-ai/sdk";
+import { toStructuredOutputSchema } from "../triage/schema.js";
 import type { Deps } from "../ports.js";
 import type { Urgency } from "../types.js";
 import { formatSgt, sgtAt, sgtDateKey, sgtTimeHHMM, toUtcIso } from "../lib/clock.js";
@@ -13,6 +14,9 @@ export const AnnouncementSchema = z.object({
   urgency: z.enum(["urgent", "normal", "low"]),
   urgencyReason: z.string().nullable(),
 });
+
+/** Same approach as email triage: z.toJSONSchema keeps the enum, which the SDK's zodOutputFormat helper drops. */
+export const ANNOUNCEMENT_JSON_SCHEMA = toStructuredOutputSchema(z.toJSONSchema(AnnouncementSchema)) as Record<string, unknown>;
 
 export interface AnnouncementInput {
   id: string;
@@ -74,25 +78,34 @@ export async function extractAnnouncement(
   now: Date,
 ): Promise<AnnouncementExtraction | null> {
   try {
-    const res = await deps.anthropic.messages.parse({
+    // messages.create rather than parse: parse() throws on a refusal written as prose, losing stop_reason.
+    const res = await deps.anthropic.messages.create({
       model: deps.config.TRIAGE_MODEL,
       max_tokens: 4000,
       system: [{ type: "text", text: ANNOUNCEMENT_PROMPT, cache_control: { type: "ephemeral" } }],
       messages: [{ role: "user", content: buildAnnouncementContent(input, now) }],
-      output_config: { format: zodOutputFormat(AnnouncementSchema), effort: "medium" },
+      output_config: { format: { type: "json_schema", schema: ANNOUNCEMENT_JSON_SCHEMA }, effort: "medium" },
     });
     if (res.stop_reason === "refusal") {
       deps.log.warn("classroom announcement extraction refused", { announcementId: input.id });
       return null;
     }
-    const out = res.parsed_output;
-    if (!out) {
-      deps.log.warn("classroom announcement extraction returned no output", {
+    const text = res.content.find((b): b is Anthropic.TextBlock => b.type === "text")?.text ?? "";
+    let json: unknown = null;
+    try {
+      json = JSON.parse(text);
+    } catch {
+      // handled below as unparseable
+    }
+    const parsed = AnnouncementSchema.safeParse(json);
+    if (!parsed.success) {
+      deps.log.warn("classroom announcement extraction returned no valid output", {
         announcementId: input.id,
         stopReason: res.stop_reason,
       });
       return null;
     }
+    const out = parsed.data;
     return {
       title: out.title.trim().slice(0, 120) || `New post in ${input.courseName}`,
       summary: out.summary.trim().slice(0, 300),
