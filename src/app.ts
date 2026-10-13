@@ -14,6 +14,8 @@ import { registerGmailRoutes } from "./gmail/routes.js";
 import { createCalendarService } from "./calendar/service.js";
 import { createClassroomService } from "./classroom/service.js";
 import { createWhatsAppClient } from "./whatsapp/client.js";
+import { createTelegramClient } from "./telegram/client.js";
+import { registerTelegramRoutes } from "./telegram/webhook.js";
 import { createOutbox } from "./whatsapp/outbox.js";
 import { createCloudTaskQueue, createInlineTaskQueue } from "./whatsapp/tasks.js";
 import { registerWhatsAppRoutes } from "./whatsapp/webhook.js";
@@ -22,7 +24,11 @@ import { registerJobRoutes } from "./scheduler/routes.js";
 import { createChatAgent } from "./agent/agent.js";
 import { registerTaskRoutes } from "./agent/routes.js";
 
-export const REGISTRARS: RouteRegistrar[] = [registerGmailRoutes, registerWhatsAppRoutes, registerJobRoutes, registerTaskRoutes];
+/** Gmail, jobs and tasks always; then the inbound webhook of the selected messenger. */
+export function registrarsFor(config: Pick<Config, "MESSENGER">): RouteRegistrar[] {
+  const messenger = config.MESSENGER === "telegram" ? registerTelegramRoutes : registerWhatsAppRoutes;
+  return [registerGmailRoutes, registerJobRoutes, registerTaskRoutes, messenger];
+}
 
 export type StoreKind = "firestore" | "memory";
 
@@ -37,6 +43,13 @@ export function chooseStoreKind(config: Pick<Config, "NODE_ENV">, env: Record<st
     return "memory";
   }
   throw new Error(`STORE must be "firestore" or "memory", got "${env.STORE}"`);
+}
+
+export type TaskQueueKind = "inline" | "cloud";
+
+/** In-process queue for local dev and for hosts without Cloud Tasks (Render); Cloud Tasks otherwise. */
+export function chooseTaskQueueKind(config: Pick<Config, "DEV_SKIP_OIDC" | "TASKS_QUEUE">): TaskQueueKind {
+  return config.DEV_SKIP_OIDC || !config.TASKS_QUEUE ? "inline" : "cloud";
 }
 
 export interface BuildOptions {
@@ -56,12 +69,14 @@ export function buildDeps(config: Config, opts: BuildOptions = {}): { deps: Deps
     store = o.store;
   } else {
     const kind = chooseStoreKind(config, env);
-    store = kind === "memory" ? new MemoryStore() : new FirestoreStore(createFirestore(config.GCP_PROJECT));
+    store = kind === "memory" ? new MemoryStore() : new FirestoreStore(createFirestore(config.GCP_PROJECT, config.FIRESTORE_CREDENTIALS_JSON));
     log.info("store selected", { kind });
   }
   const anthropic = o.anthropic ?? new Anthropic({ apiKey: config.ANTHROPIC_API_KEY });
-  const whatsapp = o.whatsapp ?? createWhatsAppClient(config);
-  const outbox = o.outbox ?? createOutbox({ clock, log, store, whatsapp });
+  // The "whatsapp" port is the messenger: Telegram implements the same interface and has no 24h window.
+  const telegram = config.MESSENGER === "telegram";
+  const whatsapp = o.whatsapp ?? (telegram ? createTelegramClient(config) : createWhatsAppClient(config));
+  const outbox = o.outbox ?? createOutbox({ clock, log, store, whatsapp }, { alwaysOpen: telegram });
   const notifier = o.notifier ?? createNotifier({ clock, log, store, outbox });
   const mail = o.mail ?? createMailService({ config, clock, log, store, anthropic, outbox });
   const calendar = o.calendar ?? createCalendarService({ config, log, store });
@@ -69,12 +84,14 @@ export function buildDeps(config: Config, opts: BuildOptions = {}): { deps: Deps
   const agent = o.agent ?? createChatAgent({ config, clock, log, store, anthropic, mail, calendar });
 
   let app: FastifyInstance | null = null;
+  // The inline queue goes through the same authenticated route as Cloud Tasks, so it sends JOB_SECRET.
+  const taskHeaders: Record<string, string> = config.JOB_SECRET ? { authorization: `Bearer ${config.JOB_SECRET}` } : {};
   const tasks =
     o.tasks ??
-    (config.DEV_SKIP_OIDC
+    (chooseTaskQueueKind(config) === "inline"
       ? createInlineTaskQueue(async (msg: InboundMessage) => {
           if (!app) throw new Error("inline task queue used before the app was built");
-          const res = await app.inject({ method: "POST", url: "/tasks/handle-message", payload: { ...msg } });
+          const res = await app.inject({ method: "POST", url: "/tasks/handle-message", headers: taskHeaders, payload: { ...msg } });
           if (res.statusCode >= 400) log.error("inline task failed", { status: res.statusCode, messageId: msg.id });
         }, log)
       : createCloudTaskQueue(config));
@@ -90,7 +107,7 @@ export function buildDeps(config: Config, opts: BuildOptions = {}): { deps: Deps
 
 export async function buildApp(config: Config, opts: BuildOptions = {}): Promise<{ app: FastifyInstance; deps: Deps }> {
   const { deps, bindApp } = buildDeps(config, opts);
-  const app = await buildServer(deps, REGISTRARS);
+  const app = await buildServer(deps, registrarsFor(config));
   bindApp(app);
   return { app, deps };
 }

@@ -17,8 +17,17 @@ type NotifyResult = "sent" | "suppressed" | "failed";
 
 const errorText = (err: unknown) => (err instanceof Error ? err.message : String(err));
 
-export function createOutbox(deps: Pick<Deps, "clock" | "log" | "store" | "whatsapp">): Outbox {
+export interface OutboxOptions {
+  /**
+   * The messenger has no 24h window (Telegram): free text can always be sent, and templates are never
+   * sent. Failed sends stay pending and are retried by flush(), as before.
+   */
+  alwaysOpen?: boolean;
+}
+
+export function createOutbox(deps: Pick<Deps, "clock" | "log" | "store" | "whatsapp">, opts: OutboxOptions = {}): Outbox {
   const { clock, log, store, whatsapp } = deps;
+  const alwaysOpen = opts.alwaysOpen === true;
   let tail: Promise<unknown> = Promise.resolve();
   let lastCreatedMs = 0;
 
@@ -36,6 +45,7 @@ export function createOutbox(deps: Pick<Deps, "clock" | "log" | "store" | "whats
   }
 
   async function windowOpen(): Promise<boolean> {
+    if (alwaysOpen) return true;
     const s = await store.state.get("whatsapp");
     return isWindowOpen(s?.lastInboundAt ?? null, clock.now());
   }
@@ -74,6 +84,7 @@ export function createOutbox(deps: Pick<Deps, "clock" | "log" | "store" | "whats
 
   /** Sends `template` unless one already went out in this bucket. On failure, flags `outboxId` for retry. */
   async function notify(template: TemplateRef, outboxId: string): Promise<NotifyResult> {
+    if (alwaysOpen) return "suppressed";
     const now = clock.now();
     const bucket = Math.floor(now.getTime() / TEMPLATE_GAP_MS);
     if (!(await store.processed.claim(`wa:tpl:${bucket}`, now.toISOString()))) {

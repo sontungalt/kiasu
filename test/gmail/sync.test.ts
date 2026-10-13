@@ -90,6 +90,25 @@ describe("syncAccount", () => {
     expect((await deps.store.accounts.get("school"))?.historyId).toBe("102");
   });
 
+  it("polling only (no GMAIL_PUBSUB_TOPIC): the tick's renew + sync pick up mail without users.watch", async () => {
+    const { deps, school, triage } = await setup({ seed: false });
+    deps.config = { ...deps.config, GMAIL_PUBSUB_TOPIC: undefined };
+    const polling = createMailService(deps, (a) => (a === "school" ? school : null), { triage });
+    school.addMessage(buildMessage({ id: "first", receivedAt: "2026-10-13T01:00:00Z" }));
+    await polling.renewWatchIfNeeded("school");
+    await polling.syncAccount("school");
+    expect(await deps.store.accounts.get("school")).toMatchObject({
+      email: "me@students.school.edu.sg", historyId: "101", watchExpiresAt: null,
+    });
+    school.addMessage(buildMessage({ id: "second", receivedAt: "2026-10-13T02:00:00Z" }));
+    deps.clock.advance(5 * 60_000);
+    await polling.renewWatchIfNeeded("school");
+    await polling.syncAccount("school");
+    expect(triage.mock.calls.map((c) => c[0].id)).toEqual(["first", "second"]);
+    expect(school.calls).toContain("listHistory:101");
+    expect(school.calls.some((c) => c.startsWith("watch"))).toBe(false);
+  });
+
   it("first sync without a historyId bootstraps from the last 3 days, oldest first", async () => {
     const { deps, school, triage, mail } = await setup({ seed: false });
     school.addMessage(buildMessage({ id: "old", receivedAt: "2026-10-12T01:00:00Z" }));

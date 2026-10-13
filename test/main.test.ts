@@ -1,6 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import Anthropic from "@anthropic-ai/sdk";
-import { buildApp, chooseStoreKind, type BuildOptions } from "../src/app.js";
+import { buildApp, buildDeps, chooseStoreKind, chooseTaskQueueKind, registrarsFor, type BuildOptions } from "../src/app.js";
+import { registerGmailRoutes } from "../src/gmail/routes.js";
+import { registerJobRoutes } from "../src/scheduler/routes.js";
+import { registerTaskRoutes } from "../src/agent/routes.js";
+import { registerWhatsAppRoutes } from "../src/whatsapp/webhook.js";
+import { registerTelegramRoutes } from "../src/telegram/webhook.js";
 import { loadConfig } from "../src/config.js";
 import { FakeClock } from "../src/lib/clock.js";
 import { silentLogger } from "../src/lib/log.js";
@@ -99,6 +104,79 @@ describe("composition root", () => {
     await deps.tasks.enqueueInbound(msg);
     await vi.waitFor(() => expect(agent.reply).toHaveBeenCalledWith("ping"));
     await app.close();
+  });
+});
+
+describe("free hosting wiring", () => {
+  const JOB_SECRET = "j".repeat(40);
+  const TG_SECRET = "tg_secret-0123456789abcdef";
+  const TELEGRAM = {
+    MESSENGER: "telegram", TELEGRAM_BOT_TOKEN: "123:abc", TELEGRAM_CHAT_ID: "4242", TELEGRAM_WEBHOOK_SECRET: TG_SECRET,
+    TASKS_QUEUE: "", JOB_SECRET,
+  };
+
+  it("registrarsFor: Gmail, jobs and tasks always, then the selected messenger's routes", () => {
+    const wa = registrarsFor(loadConfig(TEST_ENV));
+    const tg = registrarsFor(loadConfig({ ...TEST_ENV, ...TELEGRAM }));
+    expect(wa.slice(0, 3)).toEqual([registerGmailRoutes, registerJobRoutes, registerTaskRoutes]);
+    expect(tg.slice(0, 3)).toEqual([registerGmailRoutes, registerJobRoutes, registerTaskRoutes]);
+    expect(wa.slice(3)).toEqual([registerWhatsAppRoutes]);
+    expect(tg.slice(3)).toEqual([registerTelegramRoutes]);
+  });
+
+  it("MESSENGER=telegram: /webhooks/telegram instead of WhatsApp; jobs still need auth", async () => {
+    const { app } = await build(TELEGRAM);
+    expect(app.hasRoute({ method: "POST", url: "/webhooks/telegram" })).toBe(true);
+    expect(app.hasRoute({ method: "POST", url: "/webhooks/whatsapp" })).toBe(false);
+    expect(app.hasRoute({ method: "GET", url: "/webhooks/whatsapp" })).toBe(false);
+    expect((await app.inject({ method: "POST", url: "/jobs/tick" })).statusCode).toBe(401);
+    await app.close();
+  });
+
+  it("MESSENGER=telegram end to end: webhook → in-process queue → agent → reply via the Bot API, no window needed", async () => {
+    const agent: ChatAgent = { reply: vi.fn(async () => "*3 things* due this week") };
+    const tgFetch = vi.fn(async (_url: string | URL | Request, _init?: RequestInit) =>
+      new Response(JSON.stringify({ ok: true, result: { message_id: 9 } }), { status: 200 }));
+    vi.stubGlobal("fetch", tgFetch);
+    const { app } = await build(TELEGRAM, { agent });
+    const res = await app.inject({
+      method: "POST", url: "/webhooks/telegram",
+      headers: { "x-telegram-bot-api-secret-token": TG_SECRET },
+      payload: { update_id: 1, message: { message_id: 5, date: 1791936000, chat: { id: 4242, type: "private" }, text: "what's due this week?" } },
+    });
+    expect(res.statusCode).toBe(200);
+    await vi.waitFor(() => expect(tgFetch).toHaveBeenCalled());
+    expect(agent.reply).toHaveBeenCalledWith("what's due this week?");
+    const [url, init] = tgFetch.mock.calls[0]!;
+    expect(String(url)).toBe("https://api.telegram.org/bot123:abc/sendMessage");
+    expect(JSON.parse(String(init!.body))).toMatchObject({ chat_id: 4242, text: "*3 things* due this week", parse_mode: "Markdown" });
+    await app.close();
+  });
+
+  it("without TASKS_QUEUE the in-process queue calls /tasks/handle-message with JOB_SECRET", async () => {
+    const agent: ChatAgent = { reply: vi.fn(async () => "pong") };
+    const whatsapp: WhatsAppClient = {
+      sendText: vi.fn(async () => ({ messageId: "w1" })),
+      sendTemplate: vi.fn(async () => ({ messageId: "w2" })),
+    };
+    const { app, deps } = await build({ TASKS_QUEUE: "", JOB_SECRET }, { agent, whatsapp });
+    await deps.tasks.enqueueInbound({
+      id: "tg:1", from: "1", timestamp: "2026-10-14T00:00:00.000Z", type: "text", text: "ping", contextMessageId: null,
+    });
+    await vi.waitFor(() => expect(agent.reply).toHaveBeenCalledWith("ping"));
+    await app.close();
+  });
+
+  it("chooseTaskQueueKind: inline with DEV_SKIP_OIDC or without TASKS_QUEUE, otherwise Cloud Tasks", () => {
+    expect(chooseTaskQueueKind({ DEV_SKIP_OIDC: true, TASKS_QUEUE: "q" })).toBe("inline");
+    expect(chooseTaskQueueKind({ DEV_SKIP_OIDC: false, TASKS_QUEUE: undefined })).toBe("inline");
+    expect(chooseTaskQueueKind({ DEV_SKIP_OIDC: false, TASKS_QUEUE: "q" })).toBe("cloud");
+  });
+
+  it("passes FIRESTORE_CREDENTIALS_JSON to Firestore", () => {
+    const config = loadConfig({ ...TEST_ENV, FIRESTORE_CREDENTIALS_JSON: "not json" });
+    expect(() => buildDeps(config, { env: { STORE: "firestore" }, overrides: { log: silentLogger } }))
+      .toThrow(/FIRESTORE_CREDENTIALS_JSON is not valid JSON/);
   });
 });
 

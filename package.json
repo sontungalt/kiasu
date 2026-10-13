@@ -20,7 +20,9 @@
     "lint:sh": "shellcheck -x scripts/*.sh scripts/lib/*.sh",
     "deploy": "bash scripts/deploy.sh",
     "gmail:watch": "tsx --env-file=.env scripts/gmail-watch.ts",
-    "smoke": "tsx --env-file=.env scripts/smoke.ts"
+    "smoke": "tsx --env-file=.env scripts/smoke.ts",
+    "telegram:chat-id": "tsx --env-file=.env scripts/telegram-chat-id.ts",
+    "telegram:webhook": "tsx --env-file=.env scripts/telegram-webhook.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",

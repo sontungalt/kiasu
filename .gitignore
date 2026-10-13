@@ -11,3 +11,5 @@ evals/triage/labels.json
 # Firebase service-account key (never commit)
 firebase-key.json
 *-firebase-adminsdk-*.json
+# Firebase / Google service-account keys (paste into Render as FIRESTORE_CREDENTIALS_JSON, never commit)
+service-account*.json

@@ -25,6 +25,8 @@ export function buildRunEnv(dotenv: Record<string, string | undefined>, opts: Ru
   const out: Record<string, string> = {
     NODE_ENV: "production",
     DEV_SKIP_OIDC: "false",
+    // The Cloud Run ("with billing") path uses WhatsApp; the free Render path (render.yaml) uses Telegram.
+    MESSENGER: "whatsapp",
     PUBLIC_BASE_URL: normaliseBaseUrl(opts.publicBaseUrl),
     GCP_PROJECT: project,
     GCP_REGION: region,

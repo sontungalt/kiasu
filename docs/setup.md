@@ -1,4 +1,8 @@
-# kiasu-assistant setup
+# kiasu-assistant setup (Cloud Run + WhatsApp, with billing)
+
+> This is the **with billing** option: it needs a Google Cloud billing account and a Meta WhatsApp business setup.
+> Without a card, use **`docs/setup-free.md`** (Telegram + Render + Firebase Spark + cron-job.org) instead.
+> For this setup, put `MESSENGER=whatsapp` in `.env` (`npm run deploy` sets it on Cloud Run).
 
 Runbook for a fresh machine and a fresh Google Cloud project. Commands run from `~/Kiasu-assistant`.
 Never paste a secret onto a command line. Use `scripts/set-secret.sh NAME` (it prompts with hidden input).

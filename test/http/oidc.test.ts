@@ -41,4 +41,39 @@ describe("oidcPreHandler", () => {
     const a = await app({ DEV_SKIP_OIDC: "true" });
     expect((await a.inject({ method: "POST", url: "/jobs/tick" })).statusCode).toBe(200);
   });
+
+  const SECRET = "s".repeat(40);
+  const post = (a: Awaited<ReturnType<typeof app>>, authorization?: string) =>
+    a.inject({ method: "POST", url: "/jobs/tick", headers: authorization ? { authorization } : {} });
+
+  it("accepts Bearer JOB_SECRET alongside OIDC", async () => {
+    const a = await app({ JOB_SECRET: SECRET });
+    expect((await post(a, `Bearer ${SECRET}`)).statusCode).toBe(200);
+    expect((await post(a, "Bearer good")).statusCode).toBe(200);
+    expect((await post(a, `Bearer ${"s".repeat(39)}x`)).statusCode).toBe(401);
+    expect((await post(a, `Bearer ${SECRET}x`)).statusCode).toBe(401);
+    expect((await post(a, "Bearer ")).statusCode).toBe(401);
+    expect((await post(a, SECRET)).statusCode).toBe(401);
+    expect((await post(a)).statusCode).toBe(401);
+  });
+
+  it("without INVOKER_SERVICE_ACCOUNT, only JOB_SECRET works and Google OIDC is never consulted", async () => {
+    let calls = 0;
+    const counting: IdTokenVerifier = async (...args) => {
+      calls++;
+      return okVerifier(...args);
+    };
+    const config = loadConfig({ ...TEST_ENV, INVOKER_SERVICE_ACCOUNT: "", TASKS_QUEUE: "", JOB_SECRET: SECRET });
+    expect(config.INVOKER_SERVICE_ACCOUNT).toBeUndefined();
+    const a = Fastify();
+    a.post("/jobs/tick", { preHandler: oidcPreHandler({ config, log: silentLogger }, counting) }, async () => ({ ok: true }));
+    expect((await post(a, "Bearer good")).statusCode).toBe(401);
+    expect((await post(a, `Bearer ${SECRET}`)).statusCode).toBe(200);
+    expect(calls).toBe(0);
+  });
+
+  it("without JOB_SECRET, a bearer that isn't a valid OIDC token is rejected", async () => {
+    const a = await app({});
+    expect((await post(a, `Bearer ${SECRET}`)).statusCode).toBe(401);
+  });
 });

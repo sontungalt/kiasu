@@ -1,4 +1,4 @@
-import { Firestore, type DocumentData } from "@google-cloud/firestore";
+import { Firestore, type DocumentData, type Settings as FirestoreSettings } from "@google-cloud/firestore";
 import type { Store, ItemFilter } from "./types.js";
 import { applyFilter } from "./filter.js";
 import type {
@@ -6,8 +6,28 @@ import type {
 } from "../types.js";
 import { DEFAULT_SETTINGS } from "../types.js";
 
-export function createFirestore(projectId: string): Firestore {
-  return new Firestore({ projectId, ignoreUndefinedProperties: true });
+/**
+ * Firestore client settings. With `credentialsJson` (a service-account key, e.g. FIRESTORE_CREDENTIALS_JSON
+ * when hosted outside Google Cloud), only client_email and private_key are used. Errors never echo the JSON.
+ */
+export function firestoreSettings(projectId: string, credentialsJson?: string): FirestoreSettings {
+  const base: FirestoreSettings = { projectId, ignoreUndefinedProperties: true };
+  if (credentialsJson === undefined) return base;
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(credentialsJson);
+  } catch {
+    throw new Error("FIRESTORE_CREDENTIALS_JSON is not valid JSON (paste the whole service-account key file)");
+  }
+  const { client_email, private_key } = (typeof parsed === "object" && parsed !== null ? parsed : {}) as Record<string, unknown>;
+  if (typeof client_email !== "string" || !client_email || typeof private_key !== "string" || !private_key) {
+    throw new Error("FIRESTORE_CREDENTIALS_JSON must be a service-account key with client_email and private_key");
+  }
+  return { ...base, credentials: { client_email, private_key } };
+}
+
+export function createFirestore(projectId: string, credentialsJson?: string): Firestore {
+  return new Firestore(firestoreSettings(projectId, credentialsJson));
 }
 
 /** Firestore doc ids cannot contain "/". */

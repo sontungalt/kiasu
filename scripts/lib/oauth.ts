@@ -28,14 +28,25 @@ export function refreshTokenKey(account: AccountId): "GOOGLE_REFRESH_TOKEN_PERSO
   return account === "personal" ? "GOOGLE_REFRESH_TOKEN_PERSONAL" : "GOOGLE_REFRESH_TOKEN_SCHOOL";
 }
 
+/**
+ * Scopes Google reports under another name. Granting classroom.coursework.me.readonly shows up in the
+ * token as its older alias classroom.student-submissions.me.readonly.
+ */
+export const SCOPE_ALIASES: Readonly<Record<string, readonly string[]>> = {
+  "https://www.googleapis.com/auth/classroom.coursework.me.readonly": [
+    "https://www.googleapis.com/auth/classroom.student-submissions.me.readonly",
+  ],
+};
+
 export function scopeReport(
   requested: readonly string[],
   granted: readonly string[] | string | undefined,
 ): { granted: string[]; missing: string[] } {
   const list = typeof granted === "string" ? granted.split(/\s+/).filter(Boolean) : [...(granted ?? [])];
+  const has = (scope: string) => list.includes(scope) || (SCOPE_ALIASES[scope] ?? []).some((a) => list.includes(a));
   return {
-    granted: requested.filter((s) => list.includes(s)),
-    missing: requested.filter((s) => !list.includes(s)),
+    granted: requested.filter(has),
+    missing: requested.filter((s) => !has(s)),
   };
 }
 
