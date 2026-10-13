@@ -1011,7 +1011,7 @@ What the script grants, and why:
 | Cloud Tasks service agent | `roles/iam.serviceAccountUser` | `invoker@` | signs task OIDC tokens (per the Cloud Tasks docs) |
 | `<number>-compute@developer.gserviceaccount.com` | `roles/run.builder` | project | `gcloud run deploy --source` builds as this account |
 
-- [ ] **Step 1: Write the fake CLI helper**
+- [x] **Step 1: Write the fake CLI helper**
 
 `test/helpers/fake-cli.ts`:
 ```ts
@@ -1084,7 +1084,7 @@ export function runWithFakeCli(script: string, args: string[], env: Record<strin
 }
 ```
 
-- [ ] **Step 2: Write the failing test**
+- [x] **Step 2: Write the failing test**
 
 `test/scripts/setup-gcp.test.ts`:
 ```ts
@@ -1180,12 +1180,12 @@ describe("secret names", () => {
 });
 ```
 
-- [ ] **Step 3: Run the test to confirm it fails**
+- [x] **Step 3: Run the test to confirm it fails**
 
 Run: `npx vitest run test/scripts/setup-gcp.test.ts`
 Expected: FAIL. bash exits 127 (`scripts/setup-gcp.sh: No such file or directory`), and `common.sh` isn't found.
 
-- [ ] **Step 4: Write `scripts/lib/common.sh`**
+- [x] **Step 4: Write `scripts/lib/common.sh`**
 
 ```bash
 # shellcheck shell=bash
@@ -1260,7 +1260,7 @@ project_number() {
 }
 ```
 
-- [ ] **Step 5: Write `scripts/setup-gcp.sh`**
+- [x] **Step 5: Write `scripts/setup-gcp.sh`**
 
 ```bash
 #!/usr/bin/env bash
@@ -1392,7 +1392,7 @@ retry run gcloud projects add-iam-policy-binding "$GCP_PROJECT" \
 log "Done. Next: set secret values with scripts/set-secret.sh NAME (docs/setup.md Part 2)."
 ```
 
-- [ ] **Step 6: Write `scripts/set-secret.sh`**
+- [x] **Step 6: Write `scripts/set-secret.sh`**
 
 ```bash
 #!/usr/bin/env bash
@@ -1437,7 +1437,7 @@ Then make them executable:
 chmod +x scripts/setup-gcp.sh scripts/set-secret.sh
 ```
 
-- [ ] **Step 7: Add npm scripts and run the tests**
+- [x] **Step 7: Add npm scripts and run the tests**
 
 ```bash
 npm pkg set "scripts.setup:gcp=bash scripts/setup-gcp.sh"
@@ -1446,17 +1446,17 @@ npx vitest run test/scripts/setup-gcp.test.ts
 ```
 Expected: 10 passed.
 
-- [ ] **Step 8: shellcheck**
+- [ ] (skipped: shellcheck not installed) **Step 8: shellcheck**
 
 Run: `command -v shellcheck || brew install shellcheck; npm run lint:sh`
 Expected: no output, exit 0. If shellcheck flags something, fix the script (don't add a blanket disable) and re-run Step 7.
 
-- [ ] **Step 9: Dry-run against the real project (read-only)**
+- [ ] (user) **Step 9: Dry-run against the real project (read-only)**
 
 Run: `bash scripts/setup-gcp.sh --dry-run`
 Expected: `==>` progress lines on stderr, and `[dry-run] gcloud …` lines for everything that doesn't exist yet. Nothing is changed. (The real run happens in docs/setup.md Part 2, Task 3.)
 
-- [ ] **Step 10: Full suite and commit**
+- [x] **Step 10: Full suite and commit**
 
 Run: `npm test && npm run typecheck`
 Expected: all pass.
