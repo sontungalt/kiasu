@@ -1574,7 +1574,7 @@ Rules (spec §7a, §10):
 - **Every attempt that gets past the enabled check writes `state.classroom.lastSyncAt = now`**, including handled and unhandled failures (via `finally`).
 - Per-course steps run in order, each in its own try/catch. One failing course or step doesn't stop the rest. `invalid_grant` inside a step is re-thrown.
 
-- [ ] **Step 1: Write the test helpers**
+- [x] **Step 1: Write the test helpers**
 
 `test/classroom/fakes.ts`:
 ```ts
@@ -1643,7 +1643,7 @@ export function announcement(over: Partial<ClassroomAnnouncement> & { id: string
 }
 ```
 
-- [ ] **Step 2: Write the failing test**
+- [x] **Step 2: Write the failing test**
 
 `test/classroom/service.sync.test.ts`:
 ```ts
@@ -1768,12 +1768,12 @@ describe("ClassroomService guards and throttling", () => {
 });
 ```
 
-- [ ] **Step 3: Run the test to confirm it fails**
+- [x] **Step 3: Run the test to confirm it fails**
 
 Run: `npx vitest run test/classroom/service.sync.test.ts`
 Expected: FAIL with "Cannot find module '../../src/classroom/service.js'".
 
-- [ ] **Step 4: Implement the skeleton `src/classroom/service.ts`**
+- [x] **Step 4: Implement the skeleton `src/classroom/service.ts`**
 
 ```ts
 import type { ClassroomService, Deps, SyncResult } from "../ports.js";
@@ -1884,12 +1884,12 @@ export function createClassroomService(
 }
 ```
 
-- [ ] **Step 5: Run the tests**
+- [x] **Step 5: Run the tests**
 
 Run: `npx vitest run test/classroom/service.sync.test.ts && npm run typecheck`
 Expected: PASS, 8 tests, and typecheck exits 0.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/classroom/service.ts test/classroom/fakes.ts test/classroom/service.sync.test.ts
