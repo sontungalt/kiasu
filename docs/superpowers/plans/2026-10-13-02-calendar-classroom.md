@@ -1920,7 +1920,7 @@ Rules:
 - Alerts: push `result.item` to `SyncResult.alerts` when `shouldAlert(result, { importance: "high", senderEmail: null }, settings, now)`. Never set `alertedAt` here; the Notifier does that.
 - Done items are never reopened. `upsertItem` never reopens, and a `RECLAIMED_BY_STUDENT` submission doesn't reopen anything.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `test/classroom/service.coursework.test.ts`:
 ```ts
@@ -2056,12 +2056,12 @@ describe("Classroom coursework sync", () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to confirm it fails**
+- [x] **Step 2: Run the test to confirm it fails**
 
 Run: `npx vitest run test/classroom/service.coursework.test.ts`
 Expected: FAIL. The first assertion fails because no item is created (for example `expected null to match object`), since `courseSteps` is still empty.
 
-- [ ] **Step 3: Add coursework sync to `src/classroom/service.ts`**
+- [x] **Step 3: Add coursework sync to `src/classroom/service.ts`**
 
 3a. Replace the import block at the top of the file with:
 ```ts
@@ -2154,12 +2154,12 @@ with:
   const courseSteps: Array<[string, CourseStep]> = [["coursework", syncCourseWork]];
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `npx vitest run test/classroom && npm run typecheck`
 Expected: PASS, 37 tests (6 due + 7 api + 6 announcement + 8 sync + 10 coursework), and typecheck exits 0.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/classroom/service.ts test/classroom/service.coursework.test.ts

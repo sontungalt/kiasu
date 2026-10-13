@@ -2,9 +2,11 @@ import type { ClassroomService, Deps, SyncResult } from "../ports.js";
 import { EMPTY_SYNC } from "../ports.js";
 import type { Settings } from "../types.js";
 import { googleAuthFor, isInvalidGrant } from "../google/auth.js";
+import { upsertItem, type ItemDraft, type UpsertResult } from "../items/upsert.js";
+import { shouldAlert } from "../items/alerts.js";
 import {
   googleClassroomApi, isPermissionDenied,
-  type ClassroomApi, type ClassroomApiFactory, type ClassroomCourse,
+  type ClassroomApi, type ClassroomApiFactory, type ClassroomCourse, type ClassroomCourseWork,
 } from "./api.js";
 
 export type ClassroomDeps = Pick<Deps, "config" | "clock" | "log" | "store" | "anthropic">;
@@ -20,6 +22,29 @@ export type CourseStep = (client: ClassroomApi, course: ClassroomCourse, run: Sy
 
 /** A fresh copy each time, so no caller can mutate the shared EMPTY_SYNC.alerts array. */
 const empty = (): SyncResult => ({ ...EMPTY_SYNC, alerts: [] });
+
+export const DAY_MS = 86_400_000;
+/** Overdue work older than this is not turned into a new item (avoids a first-sync flood). */
+export const STALE_DUE_DAYS = 14;
+/** Undated work created longer ago than this is not turned into a new item. */
+export const STALE_UNDATED_DAYS = 30;
+const DETAILS_MAX = 500;
+const FINISHED_STATES = new Set(["TURNED_IN", "RETURNED"]);
+
+function clip(text: string, max: number): string {
+  return text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text;
+}
+
+export function courseDetails(courseName: string, text: string | null): string {
+  const body = (text ?? "").trim();
+  return body ? `${courseName}\n${clip(body, DETAILS_MAX)}` : courseName;
+}
+
+export function isStale(w: ClassroomCourseWork, now: Date): boolean {
+  if (w.dueAt) return Date.parse(w.dueAt) < now.getTime() - STALE_DUE_DAYS * DAY_MS;
+  if (w.creationTime) return Date.parse(w.creationTime) < now.getTime() - STALE_UNDATED_DAYS * DAY_MS;
+  return false;
+}
 
 export function createClassroomService(
   deps: ClassroomDeps,
@@ -38,7 +63,49 @@ export function createClassroomService(
     );
   }
 
-  const courseSteps: Array<[string, CourseStep]> = [];
+  /** Classroom items are school work, so they alert like a high-importance email (§8.3). The Notifier sets alertedAt. */
+  function collect(res: UpsertResult, run: SyncRun): void {
+    if (shouldAlert(res, { importance: "high", senderEmail: null }, run.settings, run.now)) run.result.alerts.push(res.item);
+  }
+
+  async function markDone(dedupeKey: string, nowIso: string): Promise<void> {
+    const existing = await store.items.findByDedupeKey(dedupeKey);
+    if (existing && (existing.status === "open" || existing.status === "snoozed")) {
+      await store.items.update(existing.id, { status: "done", updatedAt: nowIso });
+    }
+  }
+
+  const syncCourseWork: CourseStep = async (client, course, run) => {
+    const [work, submissions] = await Promise.all([client.listCourseWork(course.id), client.listMySubmissions(course.id)]);
+    const stateOf = new Map(submissions.map((s) => [s.courseWorkId, s.state]));
+    for (const w of work) {
+      run.result.fetched++;
+      const dedupeKey = `classroom:${w.id}`;
+      // A missing submission counts as "not turned in".
+      if (FINISHED_STATES.has(stateOf.get(w.id) ?? "")) {
+        await markDone(dedupeKey, run.nowIso);
+        continue;
+      }
+      if (isStale(w, run.now) && !(await store.items.findByDedupeKey(dedupeKey))) continue;
+      const draft: ItemDraft = {
+        type: w.dueAt ? "deadline" : "task",
+        title: w.title,
+        details: courseDetails(course.name, w.description),
+        dueAt: w.dueAt,
+        startAt: null,
+        endAt: null,
+        urgency: "normal",
+        urgencyReason: null,
+        source: {
+          kind: "classroom", courseId: course.id, courseName: course.name, courseWorkId: w.id, announcementId: null, link: w.link,
+        },
+        dedupeKey,
+      };
+      collect(await upsertItem(store, draft, run.now), run);
+    }
+  };
+
+  const courseSteps: Array<[string, CourseStep]> = [["coursework", syncCourseWork]];
 
   async function runSync(client: ClassroomApi): Promise<SyncResult> {
     const now = clock.now();
