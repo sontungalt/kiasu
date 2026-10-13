@@ -77,6 +77,19 @@ export function runStoreContract(name: string, makeStore: () => Promise<Store>) 
       expect(await store.emails.get("p1")).toMatchObject({ id: "p1" });
     });
 
+    it("emails failed-since", async () => {
+      const base = {
+        account: "school" as const, threadId: "t", from: "f", subject: "s", summary: null, category: null,
+        importance: null, needsReply: false, triageAttempts: 5, receivedAt: "2026-10-14T01:00:00.000Z",
+      };
+      await store.emails.upsert({ ...base, id: "f1", triageStatus: "failed", processedAt: "2026-10-14T03:00:00.000Z" });
+      await store.emails.upsert({ ...base, id: "f2", triageStatus: "failed", processedAt: "2026-10-14T04:00:00.000Z",
+        receivedAt: "2026-10-14T02:00:00.000Z" });
+      await store.emails.upsert({ ...base, id: "f0", triageStatus: "failed", processedAt: "2026-10-12T03:00:00.000Z" });
+      await store.emails.upsert({ ...base, id: "d1", triageStatus: "done", processedAt: "2026-10-14T03:00:00.000Z" });
+      expect((await store.emails.listFailedSince("2026-10-14T00:00:00.000Z")).map((e) => e.id)).toEqual(["f2", "f1"]);
+    });
+
     it("reminders listDue", async () => {
       const r = await store.reminders.create({ text: "x", fireAt: "2026-10-14T12:00:00.000Z", status: "pending", itemId: null, createdAt: "2026-10-14T00:00:00.000Z" });
       expect(await store.reminders.listDue("2026-10-14T11:59:59.000Z")).toHaveLength(0);

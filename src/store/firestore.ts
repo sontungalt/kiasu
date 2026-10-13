@@ -47,6 +47,10 @@ export class FirestoreStore implements Store {
       (await this.all<EmailRecord>(this.col("emails").where("processedAt", ">=", since)))
         .filter((e) => e.triageStatus === "done" && (e.importance === "high" || e.importance === "medium"))
         .sort((a, b) => b.receivedAt.localeCompare(a.receivedAt)),
+    listFailedSince: async (since) =>
+      (await this.all<EmailRecord>(this.col("emails").where("processedAt", ">=", since)))
+        .filter((e) => e.triageStatus === "failed")
+        .sort((a, b) => b.receivedAt.localeCompare(a.receivedAt)),
   };
 
   items: Store["items"] = {

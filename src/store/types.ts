@@ -24,6 +24,7 @@ export interface Store {
     upsert(email: EmailRecord): Promise<void>;
     listPending(limit: number): Promise<EmailRecord[]>; // triageStatus === "pending", oldest receivedAt first
     listImportantSince(sinceIso: string): Promise<EmailRecord[]>; // done, importance high|medium, processedAt >= since, newest first
+    listFailedSince(sinceIso: string): Promise<EmailRecord[]>; // triageStatus === "failed", processedAt >= since, newest first
   };
   items: {
     get(id: string): Promise<Item | null>;

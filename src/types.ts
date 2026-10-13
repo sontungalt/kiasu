@@ -130,6 +130,7 @@ export interface StateDocs {
   lastList: { at: string; map: Record<string, string> }; // "1" -> itemId
   briefs: { lastMorningDate: string | null; lastEveningDate: string | null }; // SGT date keys
   classroom: { lastSyncAt: string | null };
+  heldAlerts: { itemIds: string[] }; // alert-worthy items held during quiet hours (plan 04)
 }
 
 export interface CalendarEvent {

@@ -35,6 +35,10 @@ export class MemoryStore implements Store {
         .filter((e) => e.triageStatus === "done" && (e.importance === "high" || e.importance === "medium")
           && e.processedAt !== null && e.processedAt >= since)
         .sort((a, b) => b.receivedAt.localeCompare(a.receivedAt))),
+    listFailedSince: async (since) =>
+      clone([...this.emailMap.values()]
+        .filter((e) => e.triageStatus === "failed" && e.processedAt !== null && e.processedAt >= since)
+        .sort((a, b) => b.receivedAt.localeCompare(a.receivedAt))),
   };
 
   items: Store["items"] = {
