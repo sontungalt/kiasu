@@ -212,4 +212,5 @@ audience = URL + path), checks `/healthz`, and runs `npm run gmail:watch`.
 - [ ] `npm run gmail:watch` prints ✅ with an expiry about 7 days out for each connected account. The tick renews it.
 - [ ] After `npm run auth -- <account>` (token reconnect), start a new revision so it reads the new secret:
   `gcloud run services update kiasu-assistant --region=asia-southeast1 --update-env-vars=SECRETS_REFRESHED_AT=$(date +%s)`
+- [ ] Connecting an account for the first time after a deploy (its secret had no value then, so it isn't mounted): run `npm run deploy` instead.
 - [ ] Changing plain config (e.g. `CLASSROOM_ENABLED`) → edit `.env` → `npm run deploy`.

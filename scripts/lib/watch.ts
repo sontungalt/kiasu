@@ -1,4 +1,20 @@
 import { isInvalidGrant } from "../../src/google/auth.js";
+import type { AccountId, AccountState } from "../../src/types.js";
+
+/**
+ * Judges the account state AFTER MailService.renewWatchIfNeeded. That call does not throw on a
+ * revoked token (it marks the account revoked and returns), so success must be read from the state.
+ */
+export function watchOutcome(account: AccountId, state: AccountState | null, now: Date): { ok: boolean; detail: string } {
+  if (state?.authStatus === "revoked") {
+    return { ok: false, detail: `the refresh token was rejected. Run: npm run auth -- ${account}` };
+  }
+  const expiresMs = state?.watchExpiresAt ? Date.parse(state.watchExpiresAt) : Number.NaN;
+  if (!Number.isFinite(expiresMs) || expiresMs <= now.getTime()) {
+    return { ok: false, detail: "no active watch was recorded (see the log lines above)" };
+  }
+  return { ok: true, detail: `watch expires ${state?.watchExpiresAt}` };
+}
 
 /** A human hint for the common users.watch failures (spec §13.4), or null. */
 export function watchErrorHint(err: unknown, topic: string): string | null {

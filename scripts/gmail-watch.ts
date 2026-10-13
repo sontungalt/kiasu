@@ -8,7 +8,7 @@ import { buildDeps } from "../src/app.js";
 import { googleAuthFor } from "../src/google/auth.js";
 import { ACCOUNT_IDS } from "../src/types.js";
 import { ALL_SECRET_KEYS, fillFromSecretManager, projectFromEnv } from "./lib/secrets.js";
-import { watchErrorHint } from "./lib/watch.js";
+import { watchErrorHint, watchOutcome } from "./lib/watch.js";
 
 async function main(): Promise<number> {
   const useEmulator = process.argv.includes("--emulator");
@@ -29,8 +29,9 @@ async function main(): Promise<number> {
     }
     try {
       await deps.mail.renewWatchIfNeeded(account);
-      const state = await deps.store.accounts.get(account);
-      console.log(`✅ ${account}: watch expires ${state?.watchExpiresAt ?? "(unknown)"}`);
+      const outcome = watchOutcome(account, await deps.store.accounts.get(account), deps.clock.now());
+      if (!outcome.ok) failures++;
+      console.log(`${outcome.ok ? "✅" : "❌"} ${account}: ${outcome.detail}`);
     } catch (err) {
       failures++;
       console.log(`❌ ${account}: ${err instanceof Error ? err.message : String(err)}`);

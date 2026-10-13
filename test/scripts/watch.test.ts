@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { watchErrorHint } from "../../scripts/lib/watch.js";
+import { watchErrorHint, watchOutcome } from "../../scripts/lib/watch.js";
+import type { AccountState } from "../../src/types.js";
 
 const TOPIC = "projects/demo-proj/topics/gmail-push";
 
@@ -18,5 +19,27 @@ describe("watchErrorHint", () => {
   });
   it("returns null for anything else", () => {
     expect(watchErrorHint(new Error("socket hang up"), TOPIC)).toBeNull();
+  });
+});
+
+describe("watchOutcome", () => {
+  const now = new Date("2026-10-14T00:00:00Z");
+  const base: AccountState = {
+    id: "personal", email: "", historyId: "1", watchExpiresAt: "2026-10-21T00:00:00.000Z", lastSyncAt: null, authStatus: "ok",
+  };
+  it("is ok when the watch expires in the future", () => {
+    const r = watchOutcome("personal", base, now);
+    expect(r.ok).toBe(true);
+    expect(r.detail).toContain("2026-10-21T00:00:00.000Z");
+  });
+  it("fails a revoked account (renewWatchIfNeeded swallows invalid_grant) and says how to reconnect", () => {
+    const r = watchOutcome("personal", { ...base, authStatus: "revoked" }, now);
+    expect(r.ok).toBe(false);
+    expect(r.detail).toContain("npm run auth -- personal");
+  });
+  it("fails when there is no watch, or it has already expired", () => {
+    expect(watchOutcome("school", null, now).ok).toBe(false);
+    expect(watchOutcome("personal", { ...base, watchExpiresAt: null }, now).ok).toBe(false);
+    expect(watchOutcome("personal", { ...base, watchExpiresAt: "2026-10-13T00:00:00.000Z" }, now).ok).toBe(false);
   });
 });
