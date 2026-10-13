@@ -90,7 +90,7 @@ test/scripts/*.test.ts, test/infra/*.test.ts, test/main.test.ts
   - `scripts/lib/access.ts`: `type ApiName = "gmail" | "calendar" | "classroom"`, `type AccessKind = "ok" | "invalid_grant" | "scope_missing" | "api_not_enabled" | "blocked_by_admin" | "other"`, `interface AccessResult { api; kind; status: number | null; reason: string }`, `okResult(api)`, `classifyGoogleError(api, err)`, `formatResult(r)`, `adviceFor(account, results): string[]`.
   - npm scripts `auth` and `check:access`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `test/infra/agents-md.test.ts`:
 ```ts
@@ -318,12 +318,12 @@ describe("adviceFor / formatResult", () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests to confirm they fail**
+- [x] **Step 2: Run the tests to confirm they fail**
 
 Run: `npx vitest run test/infra/agents-md.test.ts test/scripts`
 Expected: FAIL. `AGENTS.md` doesn't exist (ENOENT), and the `scripts/lib/*.js` modules aren't found.
 
-- [ ] **Step 3: Write `AGENTS.md` and `CLAUDE.md`**
+- [x] **Step 3: Write `AGENTS.md` and `CLAUDE.md`**
 
 `AGENTS.md`:
 ````markdown
@@ -368,7 +368,7 @@ Tick each step (`- [x]`) as you finish it. Don't skip steps or reorder tasks.
 Everything for coding agents is in `AGENTS.md` (imported above). Read it first, then `docs/build-prompt.md`.
 ```
 
-- [ ] **Step 4: Implement `scripts/lib/secrets.ts`**
+- [x] **Step 4: Implement `scripts/lib/secrets.ts`**
 
 ```ts
 import { spawn } from "node:child_process";
@@ -458,7 +458,7 @@ export async function fillFromSecretManager(
 }
 ```
 
-- [ ] **Step 5: Implement `scripts/lib/oauth.ts`**
+- [x] **Step 5: Implement `scripts/lib/oauth.ts`**
 
 ```ts
 /** Pure helpers for scripts/auth-google.ts. */
@@ -548,7 +548,7 @@ export function readCallback(url: URL, expectedState: string): CallbackResult {
 }
 ```
 
-- [ ] **Step 6: Implement `scripts/lib/access.ts`**
+- [x] **Step 6: Implement `scripts/lib/access.ts`**
 
 ```ts
 /** Pure classification of Google API probe results for scripts/check-access.ts (spec §13 step 0). */
@@ -657,12 +657,12 @@ export function adviceFor(account: AccountId, results: AccessResult[]): string[]
 }
 ```
 
-- [ ] **Step 7: Run the unit tests**
+- [x] **Step 7: Run the unit tests**
 
 Run: `npx vitest run test/infra/agents-md.test.ts test/scripts && npm run typecheck`
 Expected: PASS. That's 3 tests in agents-md, 6 in secrets, 7 in oauth and 10 in access. Typecheck exits 0.
 
-- [ ] **Step 8: Write `scripts/auth-google.ts`**
+- [x] **Step 8: Write `scripts/auth-google.ts`**
 
 ```ts
 /**
@@ -787,7 +787,7 @@ main().then(
 );
 ```
 
-- [ ] **Step 9: Write `scripts/check-access.ts`**
+- [x] **Step 9: Write `scripts/check-access.ts`**
 
 ```ts
 /**
@@ -865,7 +865,7 @@ main().then(
 );
 ```
 
-- [ ] **Step 10: Add the npm scripts and the package name**
+- [x] **Step 10: Add the npm scripts and the package name**
 
 Run:
 ```bash
@@ -876,7 +876,7 @@ npm pkg get name scripts.auth "scripts.check:access"
 ```
 Expected: the last command prints the three values above.
 
-- [ ] **Step 11: Write `docs/setup.md` (part 1: Google Cloud + OAuth + Step 0)**
+- [x] **Step 11: Write `docs/setup.md` (part 1: Google Cloud + OAuth + Step 0)**
 
 ````markdown
 # kiasu-assistant setup
@@ -956,7 +956,7 @@ Fallbacks, in order (spec §13):
   is outside v1, so raise it with the coordinator before building it.
 ````
 
-- [ ] **Step 12: Run Step 0 for real (manual)**
+- [ ] (user) **Step 12: Run Step 0 for real (manual)**
 
 Do docs/setup.md steps 0–5 now, then fill in the table in step 6.
 Expected for `npm run check:access -- personal`:
@@ -969,12 +969,12 @@ All good: the personal account can reach Gmail, Calendar and Classroom.
 ```
 For school, either the same or one of the advice lines. Record the outcome in the step 6 table. If school Gmail is ❌, stop and report to the coordinator. Plans 01–05 can continue on the personal account.
 
-- [ ] **Step 13: Full suite**
+- [x] **Step 13: Full suite**
 
 Run: `npm test && npm run typecheck`
 Expected: all tests pass, and typecheck exits 0.
 
-- [ ] **Step 14: Commit**
+- [x] **Step 14: Commit**
 
 ```bash
 git add AGENTS.md CLAUDE.md scripts/lib/secrets.ts scripts/lib/oauth.ts scripts/lib/access.ts \
@@ -1011,7 +1011,7 @@ What the script grants, and why:
 | Cloud Tasks service agent | `roles/iam.serviceAccountUser` | `invoker@` | signs task OIDC tokens (per the Cloud Tasks docs) |
 | `<number>-compute@developer.gserviceaccount.com` | `roles/run.builder` | project | `gcloud run deploy --source` builds as this account |
 
-- [ ] **Step 1: Write the fake CLI helper**
+- [x] **Step 1: Write the fake CLI helper**
 
 `test/helpers/fake-cli.ts`:
 ```ts
@@ -1084,7 +1084,7 @@ export function runWithFakeCli(script: string, args: string[], env: Record<strin
 }
 ```
 
-- [ ] **Step 2: Write the failing test**
+- [x] **Step 2: Write the failing test**
 
 `test/scripts/setup-gcp.test.ts`:
 ```ts
@@ -1180,12 +1180,12 @@ describe("secret names", () => {
 });
 ```
 
-- [ ] **Step 3: Run the test to confirm it fails**
+- [x] **Step 3: Run the test to confirm it fails**
 
 Run: `npx vitest run test/scripts/setup-gcp.test.ts`
 Expected: FAIL. bash exits 127 (`scripts/setup-gcp.sh: No such file or directory`), and `common.sh` isn't found.
 
-- [ ] **Step 4: Write `scripts/lib/common.sh`**
+- [x] **Step 4: Write `scripts/lib/common.sh`**
 
 ```bash
 # shellcheck shell=bash
@@ -1260,7 +1260,7 @@ project_number() {
 }
 ```
 
-- [ ] **Step 5: Write `scripts/setup-gcp.sh`**
+- [x] **Step 5: Write `scripts/setup-gcp.sh`**
 
 ```bash
 #!/usr/bin/env bash
@@ -1392,7 +1392,7 @@ retry run gcloud projects add-iam-policy-binding "$GCP_PROJECT" \
 log "Done. Next: set secret values with scripts/set-secret.sh NAME (docs/setup.md Part 2)."
 ```
 
-- [ ] **Step 6: Write `scripts/set-secret.sh`**
+- [x] **Step 6: Write `scripts/set-secret.sh`**
 
 ```bash
 #!/usr/bin/env bash
@@ -1437,7 +1437,7 @@ Then make them executable:
 chmod +x scripts/setup-gcp.sh scripts/set-secret.sh
 ```
 
-- [ ] **Step 7: Add npm scripts and run the tests**
+- [x] **Step 7: Add npm scripts and run the tests**
 
 ```bash
 npm pkg set "scripts.setup:gcp=bash scripts/setup-gcp.sh"
@@ -1446,17 +1446,17 @@ npx vitest run test/scripts/setup-gcp.test.ts
 ```
 Expected: 10 passed.
 
-- [ ] **Step 8: shellcheck**
+- [ ] (skipped: shellcheck not installed) **Step 8: shellcheck**
 
 Run: `command -v shellcheck || brew install shellcheck; npm run lint:sh`
 Expected: no output, exit 0. If shellcheck flags something, fix the script (don't add a blanket disable) and re-run Step 7.
 
-- [ ] **Step 9: Dry-run against the real project (read-only)**
+- [ ] (user) **Step 9: Dry-run against the real project (read-only)**
 
 Run: `bash scripts/setup-gcp.sh --dry-run`
 Expected: `==>` progress lines on stderr, and `[dry-run] gcloud …` lines for everything that doesn't exist yet. Nothing is changed. (The real run happens in docs/setup.md Part 2, Task 3.)
 
-- [ ] **Step 10: Full suite and commit**
+- [x] **Step 10: Full suite and commit**
 
 Run: `npm test && npm run typecheck`
 Expected: all pass.
@@ -1478,7 +1478,7 @@ git commit -m "feat(infra): idempotent setup-gcp.sh and set-secret.sh"
 - Consumes: `npm run setup:gcp`, `scripts/set-secret.sh` (Task 2); `docs/whatsapp-templates.md` (written by plan 03); `/jobs/tick?now=` when `DEV_SKIP_OIDC=true` (plan 04); `STORE=memory` (Task 5).
 - Produces: the runbook sections that Tasks 6 and 7 link to: "Part 2", "Part 3: Local development".
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `test/infra/setup-doc.test.ts`:
 ```ts
@@ -1508,12 +1508,12 @@ describe("docs/setup.md", () => {
 });
 ```
 
-- [ ] **Step 2: Run it to confirm it fails**
+- [x] **Step 2: Run it to confirm it fails**
 
 Run: `npx vitest run test/infra/setup-doc.test.ts`
 Expected: FAIL on the missing `whatsapp_business_messaging` (and others).
 
-- [ ] **Step 3: Append Part 2 and Part 3 to `docs/setup.md`**
+- [x] **Step 3: Append Part 2 and Part 3 to `docs/setup.md`**
 
 ````markdown
 
@@ -1639,17 +1639,17 @@ curl -s -X POST "http://localhost:8080/jobs/tick?now=2026-10-15T13:01:00Z"      
 When you're done, point the Meta callback URL back at the Cloud Run URL.
 ````
 
-- [ ] **Step 4: Run the test**
+- [x] **Step 4: Run the test**
 
 Run: `npx vitest run test/infra/setup-doc.test.ts`
 Expected: 3 passed.
 
-- [ ] **Step 5: Do Part 2 for real (manual)**
+- [ ] (user) **Step 5: Do Part 2 for real (manual)**
 
 Run docs/setup.md steps 8–14 and 16 (the webhook, step 15, needs the deploy in Task 6 or a tunnel).
 Expected: `gcloud secrets versions list ANTHROPIC_API_KEY --limit=1` shows one `enabled` version for each secret you set.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 npm test && npm run typecheck
@@ -1671,7 +1671,7 @@ git commit -m "docs: setup part 2 (GCP resources, Meta WhatsApp) and local-dev r
 
 `gcloud run deploy --source .` uploads the files allowed by `.gcloudignore` (when it exists, it replaces the generated-from-`.gitignore` default). Cloud Build then builds with the `Dockerfile`. Two ignore files keep `.env` out at both stages.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `test/infra/dockerfile.test.ts`:
 ```ts
@@ -1708,12 +1708,12 @@ describe("container", () => {
 });
 ```
 
-- [ ] **Step 2: Run it to confirm it fails**
+- [x] **Step 2: Run it to confirm it fails**
 
 Run: `npx vitest run test/infra/dockerfile.test.ts`
 Expected: FAIL with ENOENT for `Dockerfile`.
 
-- [ ] **Step 3: Write `Dockerfile`**
+- [x] **Step 3: Write `Dockerfile`**
 
 ```dockerfile
 # syntax=docker/dockerfile:1
@@ -1740,7 +1740,7 @@ EXPOSE 8080
 CMD ["node", "dist/main.js"]
 ```
 
-- [ ] **Step 4: Write `.dockerignore` and `.gcloudignore`**
+- [x] **Step 4: Write `.dockerignore` and `.gcloudignore`**
 
 `.dockerignore`:
 ```
@@ -1770,7 +1770,7 @@ evals/
 coverage/
 ```
 
-- [ ] **Step 5: Run the test and check what `--source` would upload**
+- [x] **Step 5: Run the test and check what `--source` would upload**
 
 Run: `npx vitest run test/infra/dockerfile.test.ts`
 Expected: 3 passed.
@@ -1778,12 +1778,12 @@ Expected: 3 passed.
 Run: `gcloud meta list-files-for-upload . | sort | grep -E '^(\.env|Dockerfile|package-lock\.json|src/)' | head`
 Expected: `Dockerfile`, `package-lock.json` and `src/…` lines, and **no `.env` line**. (If gcloud prints `No module named 'grpc'`, it's a local gcloud install problem. Run `gcloud components reinstall` or follow the printed `CLOUDSDK_PYTHON_SITEPACKAGES` hint, then retry.)
 
-- [ ] **Step 6: Build the image (optional, only if Docker or OrbStack is installed)**
+- [ ] (skipped: Docker not installed) **Step 6: Build the image (optional, only if Docker or OrbStack is installed)**
 
 Run: `docker build -t kiasu-assistant .`
 Expected: the build succeeds. In Phase A, `dist/main.js` doesn't exist yet, so don't `docker run` until Task 5. If Docker isn't installed, skip this step. Cloud Build builds the same Dockerfile in Task 6.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 npm test && npm run typecheck

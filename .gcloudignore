@@ -1,0 +1,7 @@
+#!include:.gitignore
+.git
+.gcloudignore
+docs/
+test/
+evals/
+coverage/

@@ -13,7 +13,11 @@
     "test:firestore": "FIRESTORE_EMULATOR_HOST=127.0.0.1:8085 GCP_PROJECT=demo-inbox vitest run test/store",
     "typecheck": "tsc --noEmit",
     "eval:triage": "tsx --env-file=.env evals/triage/run.ts",
-    "export:fixtures": "tsx --env-file=.env scripts/export-fixtures.ts"
+    "export:fixtures": "tsx --env-file=.env scripts/export-fixtures.ts",
+    "auth": "tsx --env-file=.env scripts/auth-google.ts",
+    "check:access": "tsx --env-file=.env scripts/check-access.ts",
+    "setup:gcp": "bash scripts/setup-gcp.sh",
+    "lint:sh": "shellcheck -x scripts/*.sh scripts/lib/*.sh"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",
