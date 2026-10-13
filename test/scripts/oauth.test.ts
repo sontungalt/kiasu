@@ -24,6 +24,15 @@ describe("oauth helpers", () => {
     expect(scopeReport(req, undefined)).toEqual({ granted: [], missing: ["a", "b", "c"] });
   });
 
+  it("accepts Google's alias classroom.student-submissions.me.readonly for classroom.coursework.me.readonly", () => {
+    const cw = "https://www.googleapis.com/auth/classroom.coursework.me.readonly";
+    const alias = "https://www.googleapis.com/auth/classroom.student-submissions.me.readonly";
+    const gmail = "https://www.googleapis.com/auth/gmail.readonly";
+    expect(scopeReport([gmail, cw], `${gmail} ${alias}`)).toEqual({ granted: [gmail, cw], missing: [] });
+    expect(scopeReport([cw], [cw])).toEqual({ granted: [cw], missing: [] });
+    expect(scopeReport([cw], [gmail])).toEqual({ granted: [], missing: [cw] });
+  });
+
   it("tokenWarnings flags an expiring refresh token", () => {
     expect(tokenWarnings({ refresh_token: "1//x" })).toEqual([]);
     const w = tokenWarnings({ refresh_token: "1//x", refresh_token_expires_in: 604799 });
