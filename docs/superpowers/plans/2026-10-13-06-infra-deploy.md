@@ -1671,7 +1671,7 @@ git commit -m "docs: setup part 2 (GCP resources, Meta WhatsApp) and local-dev r
 
 `gcloud run deploy --source .` uploads the files allowed by `.gcloudignore` (when it exists, it replaces the generated-from-`.gitignore` default). Cloud Build then builds with the `Dockerfile`. Two ignore files keep `.env` out at both stages.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `test/infra/dockerfile.test.ts`:
 ```ts
@@ -1708,12 +1708,12 @@ describe("container", () => {
 });
 ```
 
-- [ ] **Step 2: Run it to confirm it fails**
+- [x] **Step 2: Run it to confirm it fails**
 
 Run: `npx vitest run test/infra/dockerfile.test.ts`
 Expected: FAIL with ENOENT for `Dockerfile`.
 
-- [ ] **Step 3: Write `Dockerfile`**
+- [x] **Step 3: Write `Dockerfile`**
 
 ```dockerfile
 # syntax=docker/dockerfile:1
@@ -1740,7 +1740,7 @@ EXPOSE 8080
 CMD ["node", "dist/main.js"]
 ```
 
-- [ ] **Step 4: Write `.dockerignore` and `.gcloudignore`**
+- [x] **Step 4: Write `.dockerignore` and `.gcloudignore`**
 
 `.dockerignore`:
 ```
@@ -1770,7 +1770,7 @@ evals/
 coverage/
 ```
 
-- [ ] **Step 5: Run the test and check what `--source` would upload**
+- [x] **Step 5: Run the test and check what `--source` would upload**
 
 Run: `npx vitest run test/infra/dockerfile.test.ts`
 Expected: 3 passed.
@@ -1778,12 +1778,12 @@ Expected: 3 passed.
 Run: `gcloud meta list-files-for-upload . | sort | grep -E '^(\.env|Dockerfile|package-lock\.json|src/)' | head`
 Expected: `Dockerfile`, `package-lock.json` and `src/…` lines, and **no `.env` line**. (If gcloud prints `No module named 'grpc'`, it's a local gcloud install problem. Run `gcloud components reinstall` or follow the printed `CLOUDSDK_PYTHON_SITEPACKAGES` hint, then retry.)
 
-- [ ] **Step 6: Build the image (optional, only if Docker or OrbStack is installed)**
+- [ ] (skipped: Docker not installed) **Step 6: Build the image (optional, only if Docker or OrbStack is installed)**
 
 Run: `docker build -t kiasu-assistant .`
 Expected: the build succeeds. In Phase A, `dist/main.js` doesn't exist yet, so don't `docker run` until Task 5. If Docker isn't installed, skip this step. Cloud Build builds the same Dockerfile in Task 6.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 npm test && npm run typecheck
