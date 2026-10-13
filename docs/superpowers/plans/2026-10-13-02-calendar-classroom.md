@@ -118,7 +118,7 @@ test/classroom/service.announcements.test.ts
   - `calendarApiFromClient(raw: CalendarRawClient): CalendarApi`
   - `googleCalendarApi: CalendarApiFactory`
 
-- [ ] **Step 1: Write the failing pager test**
+- [x] **Step 1: Write the failing pager test**
 
 `test/google/collect-pages.test.ts`:
 ```ts
@@ -172,7 +172,7 @@ describe("collectPages", () => {
 });
 ```
 
-- [ ] **Step 2: Write the failing Calendar adapter test**
+- [x] **Step 2: Write the failing Calendar adapter test**
 
 `test/calendar/api.test.ts`:
 ```ts
@@ -246,12 +246,12 @@ describe("calendarApiFromClient", () => {
 });
 ```
 
-- [ ] **Step 3: Run the tests to confirm they fail**
+- [x] **Step 3: Run the tests to confirm they fail**
 
 Run: `npx vitest run test/google/collect-pages.test.ts test/calendar/api.test.ts`
 Expected: FAIL with "Cannot find module '../../src/google/collect-pages.js'" (and the same for `../../src/calendar/api.js`).
 
-- [ ] **Step 4: Implement `src/google/collect-pages.ts`**
+- [x] **Step 4: Implement `src/google/collect-pages.ts`**
 
 ```ts
 export interface Page<T> {
@@ -288,7 +288,7 @@ export async function collectPages<T>(
 }
 ```
 
-- [ ] **Step 5: Implement `src/calendar/api.ts`**
+- [x] **Step 5: Implement `src/calendar/api.ts`**
 
 ```ts
 import { google } from "googleapis";
@@ -376,13 +376,13 @@ export const googleCalendarApi: CalendarApiFactory = (auth) => {
 };
 ```
 
-- [ ] **Step 6: Run the tests**
+- [x] **Step 6: Run the tests**
 
 Run: `npx vitest run test/google/collect-pages.test.ts test/calendar/api.test.ts && npm run typecheck`
 Expected: PASS, 7 tests (4 + 3), and typecheck exits 0.
 If typecheck rejects `googleCalendarApi`'s `.data` assignments, the googleapis `Schema$*` types have drifted from the raw interfaces. Widen the raw interface field to match (for example add `| undefined`). Do not cast to `any`.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/google/collect-pages.ts src/calendar/api.ts test/google/collect-pages.test.ts test/calendar/api.test.ts
