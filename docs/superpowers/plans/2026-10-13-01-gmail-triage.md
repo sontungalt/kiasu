@@ -2877,7 +2877,7 @@ git commit -m "feat(gmail): MailService (history sync, fallback, retries, revoke
 
 The OIDC audience is `PUBLIC_BASE_URL + "/webhooks/gmail"`, and the service account is `INVOKER_SERVICE_ACCOUNT` (plan 00's `oidcPreHandler`). Plan 06 must create the push subscription with that audience. The route **always replies 204** once authenticated, even on malformed bodies and sync errors, because the 5-minute tick catch-up is the safety net and a non-2xx response would only make Pub/Sub retry.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `test/gmail/routes.test.ts`:
 ```ts
@@ -2972,12 +2972,12 @@ describe("POST /webhooks/gmail", () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests to confirm they fail**
+- [x] **Step 2: Run the tests to confirm they fail**
 
 Run: `npx vitest run test/gmail/routes.test.ts`
 Expected: FAIL, `../../src/gmail/routes.js` not found.
 
-- [ ] **Step 3: Implement `src/gmail/routes.ts`**
+- [x] **Step 3: Implement `src/gmail/routes.ts`**
 
 ```ts
 import { z } from "zod";
@@ -3050,12 +3050,12 @@ export const registerGmailRoutes: RouteRegistrar = (app, deps) => {
 };
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `npx vitest run test/gmail/routes.test.ts && npm run typecheck`
 Expected: 6 passed.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/gmail/routes.ts test/gmail/routes.test.ts
