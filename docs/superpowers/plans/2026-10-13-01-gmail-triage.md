@@ -1073,7 +1073,7 @@ git commit -m "feat(gmail): parse messages to ParsedEmail (plain/HTML, attachmen
 
 The Zod schema carries **no length or format constraints**. The API ignores them, and Zod would then reject an otherwise good answer. The 200-character summary limit is applied in `normaliseTriage` (Task 4).
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `test/triage/schema.test.ts`:
 ```ts
@@ -1200,12 +1200,12 @@ describe("SYSTEM_PROMPT", () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests to confirm they fail**
+- [x] **Step 2: Run the tests to confirm they fail**
 
 Run: `npx vitest run test/triage/schema.test.ts test/triage/prompt.test.ts`
 Expected: FAIL, modules not found.
 
-- [ ] **Step 3: Implement `src/triage/schema.ts`**
+- [x] **Step 3: Implement `src/triage/schema.ts`**
 
 ```ts
 import { z } from "zod";
@@ -1275,7 +1275,7 @@ export function toStructuredOutputSchema(node: unknown): unknown {
 export const TRIAGE_JSON_SCHEMA = toStructuredOutputSchema(z.toJSONSchema(TriageSchema)) as JsonObject;
 ```
 
-- [ ] **Step 4: Implement `src/triage/prompt.ts`**
+- [x] **Step 4: Implement `src/triage/prompt.ts`**
 
 ```ts
 import type { AccountId, ParsedEmail } from "../types.js";
@@ -1355,12 +1355,12 @@ export function buildTriageInput(parsed: ParsedEmail, account: AccountId, now: D
 }
 ```
 
-- [ ] **Step 5: Run the tests**
+- [x] **Step 5: Run the tests**
 
 Run: `npx vitest run test/triage/schema.test.ts test/triage/prompt.test.ts && npm run typecheck`
 Expected: 10 passed (4 + 6).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/triage/schema.ts src/triage/prompt.ts test/triage/schema.test.ts test/triage/prompt.test.ts
