@@ -1478,7 +1478,7 @@ git commit -m "feat(infra): idempotent setup-gcp.sh and set-secret.sh"
 - Consumes: `npm run setup:gcp`, `scripts/set-secret.sh` (Task 2); `docs/whatsapp-templates.md` (written by plan 03); `/jobs/tick?now=` when `DEV_SKIP_OIDC=true` (plan 04); `STORE=memory` (Task 5).
 - Produces: the runbook sections that Tasks 6 and 7 link to: "Part 2", "Part 3: Local development".
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `test/infra/setup-doc.test.ts`:
 ```ts
@@ -1508,12 +1508,12 @@ describe("docs/setup.md", () => {
 });
 ```
 
-- [ ] **Step 2: Run it to confirm it fails**
+- [x] **Step 2: Run it to confirm it fails**
 
 Run: `npx vitest run test/infra/setup-doc.test.ts`
 Expected: FAIL on the missing `whatsapp_business_messaging` (and others).
 
-- [ ] **Step 3: Append Part 2 and Part 3 to `docs/setup.md`**
+- [x] **Step 3: Append Part 2 and Part 3 to `docs/setup.md`**
 
 ````markdown
 
@@ -1639,17 +1639,17 @@ curl -s -X POST "http://localhost:8080/jobs/tick?now=2026-10-15T13:01:00Z"      
 When you're done, point the Meta callback URL back at the Cloud Run URL.
 ````
 
-- [ ] **Step 4: Run the test**
+- [x] **Step 4: Run the test**
 
 Run: `npx vitest run test/infra/setup-doc.test.ts`
 Expected: 3 passed.
 
-- [ ] **Step 5: Do Part 2 for real (manual)**
+- [ ] (user) **Step 5: Do Part 2 for real (manual)**
 
 Run docs/setup.md steps 8–14 and 16 (the webhook, step 15, needs the deploy in Task 6 or a tunnel).
 Expected: `gcloud secrets versions list ANTHROPIC_API_KEY --limit=1` shows one `enabled` version for each secret you set.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 npm test && npm run typecheck
