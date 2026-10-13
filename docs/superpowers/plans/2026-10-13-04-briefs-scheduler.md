@@ -195,7 +195,7 @@ git commit -m "feat(contract): heldAlerts state doc and emails.listFailedSince"
   - `eventLine(e: CalendarEvent): string`, `emailLine(e: EmailRecord): string`, `failedEmailsBlock(emails: EmailRecord[]): string | null`, `moreLine(hidden: number): string`, `weekdayOf(now: Date): string`
 - Test fixtures produced (`test/brief/fixtures.ts`): `MORNING`, `EVENING`, `emailSource(from)`, `classroomSource(courseName)`, `MANUAL`, `item(id, over)`, `email(id, over)`, `event(id, over)`.
 
-- [ ] **Step 1: Write the shared fixtures**
+- [x] **Step 1: Write the shared fixtures**
 
 `test/brief/fixtures.ts`:
 ```ts
@@ -238,7 +238,7 @@ export function event(id: string, over: Partial<CalendarEvent> = {}): CalendarEv
 }
 ```
 
-- [ ] **Step 2: Write the failing test**
+- [x] **Step 2: Write the failing test**
 
 `test/brief/format.test.ts`:
 ```ts
@@ -337,12 +337,12 @@ describe("format helpers", () => {
 });
 ```
 
-- [ ] **Step 3: Run the test to confirm it fails**
+- [x] **Step 3: Run the test to confirm it fails**
 
 Run: `npx vitest run test/brief/format.test.ts`
 Expected: FAIL, because `../../src/brief/format.js` can't be resolved.
 
-- [ ] **Step 4: Implement**
+- [x] **Step 4: Implement**
 
 `src/brief/format.ts`:
 ```ts
@@ -469,12 +469,12 @@ export function weekdayOf(now: Date): string {
 }
 ```
 
-- [ ] **Step 5: Run the tests**
+- [x] **Step 5: Run the tests**
 
 Run: `npx vitest run test/brief/format.test.ts && npm run typecheck`
 Expected: `12 passed`, and typecheck exits 0.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/brief/format.ts test/brief/fixtures.ts test/brief/format.test.ts
@@ -520,7 +520,7 @@ git commit -m "feat(brief): WhatsApp formatting helpers"
 
 Morning layout (§8.2, §7a): header, then *🗓 Today* (events), *⚠️ Overdue*, *📌 Due today*, *🗓 Due tomorrow*, *🌙 Came in overnight* (held alerts), *📬 New & important*, the couldn't-read emails, the health lines and the footer. Held items appear only under *Came in overnight*, never twice. The footer appears only when something is numbered. `counts.dueToday` counts every open item due later today, including held ones and ones hidden by the cap. `counts.urgent` counts every item the brief covers with `urgency === "urgent"`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `test/brief/morning.test.ts`:
 ```ts
@@ -644,12 +644,12 @@ describe("composeMorning", () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to confirm it fails**
+- [x] **Step 2: Run the test to confirm it fails**
 
 Run: `npx vitest run test/brief/morning.test.ts`
 Expected: FAIL, because `../../src/brief/morning.js` can't be resolved.
 
-- [ ] **Step 3: Implement the builder**
+- [x] **Step 3: Implement the builder**
 
 `src/brief/builder.ts`:
 ```ts
@@ -742,7 +742,7 @@ export class BriefBuilder {
 }
 ```
 
-- [ ] **Step 4: Implement the morning composer**
+- [x] **Step 4: Implement the morning composer**
 
 `src/brief/morning.ts`:
 ```ts
@@ -783,12 +783,12 @@ export function composeMorning(input: BriefInput, now: Date): ComposedBrief {
 }
 ```
 
-- [ ] **Step 5: Run the tests**
+- [x] **Step 5: Run the tests**
 
 Run: `npx vitest run test/brief && npm run typecheck`
 Expected: `18 passed` (12 format + 6 morning), and typecheck exits 0.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/brief/builder.ts src/brief/morning.ts test/brief/morning.test.ts
@@ -809,7 +809,7 @@ git commit -m "feat(brief): morning brief composer with numbering and section ca
 
 Evening layout (§8.2, §7a): header, *🗓 Tomorrow* (events), *🗓 Due tomorrow*, *⏳ Still open from today* (items due today that are still open, including ones already past), *🚨 Urgent since this morning*, health lines and the footer. The urgent section contains held overnight alerts, plus open items that were alerted at or after `sinceIso`, plus open items with `urgency === "urgent"` created at or after `sinceIso`, minus anything already listed. `importantEmails` and `failedEmails` are ignored, because they belong to the morning. The template label is `"<Weekday> evening"`. `counts.dueToday` is the number of items still open from today.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `test/brief/evening.test.ts`:
 ```ts
@@ -893,12 +893,12 @@ describe("composeEvening", () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to confirm it fails**
+- [x] **Step 2: Run the test to confirm it fails**
 
 Run: `npx vitest run test/brief/evening.test.ts`
 Expected: FAIL, because `../../src/brief/evening.js` can't be resolved.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 `src/brief/evening.ts`:
 ```ts
@@ -936,12 +936,12 @@ export function composeEvening(input: BriefInput, now: Date): ComposedBrief {
 }
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `npx vitest run test/brief && npm run typecheck`
 Expected: `21 passed`, and typecheck exits 0.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/brief/evening.ts test/brief/evening.test.ts
@@ -971,7 +971,7 @@ git commit -m "feat(brief): evening check-in composer"
 5. Otherwise, compose one grouped message (numbered, at most 8 lines), call `outbox.deliver({kind:"alert", text, template: heads_up [summary ≤ 60]})`, save the numbering to `state/lastList`, and set `alertedAt` on every item.
 6. If `deliver` throws, add the items to the held list (so the next brief still shows them) and rethrow.
 
-- [ ] **Step 1: Write the test fakes**
+- [x] **Step 1: Write the test fakes**
 
 `test/helpers/scheduler-fakes.ts`:
 ```ts
@@ -1043,7 +1043,7 @@ export function makeSchedulerDeps(nowIso: string, over: Partial<Deps> = {}) {
 }
 ```
 
-- [ ] **Step 2: Write the failing test**
+- [x] **Step 2: Write the failing test**
 
 `test/notify/notifier.test.ts`:
 ```ts
@@ -1145,12 +1145,12 @@ describe("Notifier.sendAlerts", () => {
 });
 ```
 
-- [ ] **Step 3: Run the test to confirm it fails**
+- [x] **Step 3: Run the test to confirm it fails**
 
 Run: `npx vitest run test/notify/notifier.test.ts`
 Expected: FAIL, because `../../src/notify/notifier.js` can't be resolved.
 
-- [ ] **Step 4: Implement the held-alerts helpers**
+- [x] **Step 4: Implement the held-alerts helpers**
 
 `src/notify/held.ts`:
 ```ts
@@ -1191,7 +1191,7 @@ export async function pruneHeldAlerts(store: Store): Promise<void> {
 }
 ```
 
-- [ ] **Step 5: Implement the Notifier**
+- [x] **Step 5: Implement the Notifier**
 
 `src/notify/notifier.ts`:
 ```ts
@@ -1262,12 +1262,12 @@ export function createNotifier(deps: Pick<Deps, "clock" | "log" | "store" | "out
 }
 ```
 
-- [ ] **Step 6: Run the tests**
+- [x] **Step 6: Run the tests**
 
 Run: `npx vitest run test/notify && npm test && npm run typecheck`
 Expected: `7 passed` for the notifier, the full suite green, and typecheck exits 0.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/notify test/notify test/helpers/scheduler-fakes.ts
@@ -1299,7 +1299,7 @@ Rules:
   - Then outbox messages that are pending with `lastError !== null && attempts >= 3`. Pending messages with no error are just waiting for the 24h window, so they're not stuck.
   - Then the calendar failure line.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `test/brief/gather.test.ts`:
 ```ts
@@ -1395,12 +1395,12 @@ describe("healthLines", () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to confirm it fails**
+- [x] **Step 2: Run the test to confirm it fails**
 
 Run: `npx vitest run test/brief/gather.test.ts`
 Expected: FAIL, because `../../src/brief/gather.js` can't be resolved.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 `src/brief/gather.ts`:
 ```ts
@@ -1477,12 +1477,12 @@ export async function healthLines(store: Store, now: Date): Promise<string[]> {
 }
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `npx vitest run test/brief && npm run typecheck`
 Expected: `27 passed` (12 + 6 + 3 + 6), and typecheck exits 0.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/brief/gather.ts test/brief/gather.test.ts
@@ -1508,7 +1508,7 @@ Rules (§8.4):
 - All due-soon items go into one message, sent with `outbox.deliver({kind:"nudge"})`. Then every candidate gets `nudgedAt = now`, so each item is nudged once.
 - Nudges use bullets, not numbers, and don't overwrite `lastList`. That way a "done 3" that refers to the morning brief keeps working.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `test/scheduler/nudges.test.ts`:
 ```ts
@@ -1578,12 +1578,12 @@ describe("sendNudges", () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to confirm it fails**
+- [x] **Step 2: Run the test to confirm it fails**
 
 Run: `npx vitest run test/scheduler/nudges.test.ts`
 Expected: FAIL, because `../../src/scheduler/nudges.js` can't be resolved.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 `src/scheduler/nudges.ts`:
 ```ts
@@ -1629,12 +1629,12 @@ export async function sendNudges(deps: Pick<Deps, "store" | "outbox" | "log">, n
 }
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `npx vitest run test/scheduler/nudges.test.ts && npm run typecheck`
 Expected: `5 passed`, and typecheck exits 0.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/scheduler/nudges.ts test/scheduler/nudges.test.ts
@@ -1660,7 +1660,7 @@ Rules (§8.5):
 - Otherwise, gather and compose. Then claim `brief:<kind>:<dateKey>` with `store.processed.claim` *right before* delivering. Doing the claim after gather and compose means a gather failure leaves the brief unclaimed, so the next tick retries it. If the claim is lost, return `"skipped"` because another tick is sending it.
 - After delivering: save `numbering` to `state/lastList`, set `state/briefs`, mark the overnight alerts as alerted, and prune the held list.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `test/scheduler/briefs.test.ts`:
 ```ts
@@ -1742,12 +1742,12 @@ describe("maybeSendBrief", () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to confirm it fails**
+- [x] **Step 2: Run the test to confirm it fails**
 
 Run: `npx vitest run test/scheduler/briefs.test.ts`
 Expected: FAIL, because `../../src/scheduler/briefs.js` can't be resolved.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 `src/scheduler/briefs.ts`:
 ```ts
@@ -1804,12 +1804,12 @@ export async function maybeSendBrief(
 }
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `npx vitest run test/scheduler/briefs.test.ts && npm run typecheck`
 Expected: `6 passed`, and typecheck exits 0.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/scheduler/briefs.ts test/scheduler/briefs.test.ts
@@ -1847,7 +1847,7 @@ The steps run in this order, and the report keys are added in the same order:
 
 A step that throws is recorded as `{ error: message }` and logged, and the remaining steps continue.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `test/scheduler/tick.test.ts`:
 ```ts
@@ -2005,12 +2005,12 @@ describe("tick", () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to confirm it fails**
+- [x] **Step 2: Run the test to confirm it fails**
 
 Run: `npx vitest run test/scheduler/tick.test.ts`
 Expected: FAIL, because `../../src/scheduler/tick.js` can't be resolved.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 `src/scheduler/tick.ts`:
 ```ts
@@ -2105,12 +2105,12 @@ export async function tick(deps: Deps, now: Date = deps.clock.now()): Promise<Ti
 }
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `npx vitest run test/scheduler && npm run typecheck`
 Expected: `18 passed` (5 nudges + 6 briefs + 7 tick), and typecheck exits 0.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/scheduler/tick.ts test/scheduler/tick.test.ts
@@ -2134,7 +2134,7 @@ Behavior:
 - When `config.DEV_SKIP_OIDC` is true, `?now=<ISO>` sets the time. The route builds a copy of `deps` with a fixed clock and a fresh notifier bound to that clock, then runs `tick(devDeps, at)`. An invalid `now` returns 400. Without `DEV_SKIP_OIDC`, `?now` is ignored.
 - The route never reads a body. Cloud Scheduler may send an empty body with `Content-Type: application/json`, which Fastify's default JSON parser rejects. So this encapsulated scope replaces the body parsers with a catch-all that ignores the body.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `test/scheduler/routes.test.ts`:
 ```ts
@@ -2199,12 +2199,12 @@ describe("POST /jobs/tick", () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to confirm it fails**
+- [x] **Step 2: Run the test to confirm it fails**
 
 Run: `npx vitest run test/scheduler/routes.test.ts`
 Expected: FAIL, because `../../src/scheduler/routes.js` can't be resolved.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 `src/scheduler/routes.ts`:
 ```ts
@@ -2238,12 +2238,12 @@ export function jobRoutes(verify?: IdTokenVerifier): RouteRegistrar {
 export const registerJobRoutes: RouteRegistrar = jobRoutes();
 ```
 
-- [ ] **Step 4: Run the full suite**
+- [x] **Step 4: Run the full suite**
 
 Run: `npm test && npm run typecheck`
 Expected: every test passes (`routes.test.ts`: 5 passed), the Firestore suite is skipped without the emulator, and typecheck exits 0.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/scheduler/routes.ts test/scheduler/routes.test.ts
