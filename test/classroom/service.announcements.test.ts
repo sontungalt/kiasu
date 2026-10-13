@@ -68,6 +68,22 @@ describe("Classroom announcement sync", () => {
     expect(await deps.store.items.list({})).toHaveLength(1);
   });
 
+  it("retries an announcement whose item failed to save", async () => {
+    withModel(() => jsonReply({ title: "Quiz on Friday", summary: "Short quiz Fri.", dueAt: null, urgency: "normal", urgencyReason: null }));
+    fake.announcements.c1 = [announcement({ id: "a1" })];
+    const realCreate = deps.store.items.create;
+    let failures = 1;
+    deps.store.items.create = async (data) => {
+      if (failures-- > 0) throw new Error("firestore unavailable");
+      return realCreate(data);
+    };
+    await svc().sync();
+    expect(await find("classroom:announcement:a1")).toBeNull();
+    deps.clock.advance(31 * 60_000);
+    await svc().sync();
+    expect(await find("classroom:announcement:a1")).toMatchObject({ title: "Quiz on Friday" });
+  });
+
   it("ignores announcements created more than 7 days ago", async () => {
     withModel(() => jsonReply({ title: "x", summary: "x", dueAt: null, urgency: "normal", urgencyReason: null }));
     fake.announcements.c1 = [

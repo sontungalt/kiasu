@@ -119,7 +119,8 @@ export function createClassroomService(
       if (a.creationTime < sinceIso) continue;
       run.result.fetched++;
       const dedupeKey = `classroom:announcement:${a.id}`;
-      if (!(await store.processed.claim(dedupeKey, run.nowIso))) continue;
+      // Done once its item exists, so an announcement whose save failed is retried on the next sync.
+      if (await store.items.findByDedupeKey(dedupeKey)) continue;
       const extracted = a.text.trim()
         ? await extractAnnouncement(deps, { id: a.id, courseName: course.name, text: a.text, postedAt: a.creationTime }, run.now)
         : null;
@@ -141,7 +142,7 @@ export function createClassroomService(
             dedupeKey,
           }
         : {
-            // Model failed, refused, or there was no text: keep a plain record so nothing is lost after the claim.
+            // Model failed, refused, or there was no text: keep a plain record so the announcement isn't lost.
             type: "info",
             title: firstLine(a.text) || `New post in ${course.name}`,
             details: courseDetails(course.name, a.text),
