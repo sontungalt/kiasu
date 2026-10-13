@@ -118,7 +118,7 @@ test/classroom/service.announcements.test.ts
   - `calendarApiFromClient(raw: CalendarRawClient): CalendarApi`
   - `googleCalendarApi: CalendarApiFactory`
 
-- [ ] **Step 1: Write the failing pager test**
+- [x] **Step 1: Write the failing pager test**
 
 `test/google/collect-pages.test.ts`:
 ```ts
@@ -172,7 +172,7 @@ describe("collectPages", () => {
 });
 ```
 
-- [ ] **Step 2: Write the failing Calendar adapter test**
+- [x] **Step 2: Write the failing Calendar adapter test**
 
 `test/calendar/api.test.ts`:
 ```ts
@@ -246,12 +246,12 @@ describe("calendarApiFromClient", () => {
 });
 ```
 
-- [ ] **Step 3: Run the tests to confirm they fail**
+- [x] **Step 3: Run the tests to confirm they fail**
 
 Run: `npx vitest run test/google/collect-pages.test.ts test/calendar/api.test.ts`
 Expected: FAIL with "Cannot find module '../../src/google/collect-pages.js'" (and the same for `../../src/calendar/api.js`).
 
-- [ ] **Step 4: Implement `src/google/collect-pages.ts`**
+- [x] **Step 4: Implement `src/google/collect-pages.ts`**
 
 ```ts
 export interface Page<T> {
@@ -288,7 +288,7 @@ export async function collectPages<T>(
 }
 ```
 
-- [ ] **Step 5: Implement `src/calendar/api.ts`**
+- [x] **Step 5: Implement `src/calendar/api.ts`**
 
 ```ts
 import { google } from "googleapis";
@@ -376,13 +376,13 @@ export const googleCalendarApi: CalendarApiFactory = (auth) => {
 };
 ```
 
-- [ ] **Step 6: Run the tests**
+- [x] **Step 6: Run the tests**
 
 Run: `npx vitest run test/google/collect-pages.test.ts test/calendar/api.test.ts && npm run typecheck`
 Expected: PASS, 7 tests (4 + 3), and typecheck exits 0.
 If typecheck rejects `googleCalendarApi`'s `.data` assignments, the googleapis `Schema$*` types have drifted from the raw interfaces. Widen the raw interface field to match (for example add `| undefined`). Do not cast to `any`.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/google/collect-pages.ts src/calendar/api.ts test/google/collect-pages.test.ts test/calendar/api.test.ts
@@ -412,7 +412,7 @@ Behaviour:
 - Sort by start, with all-day before timed at the same instant and personal before school. Dedupe by lowercase trimmed title plus `startAt`, keeping the first copy.
 - An account failure (including `invalid_grant`) is logged as a warning and that account contributes `[]`. A single calendar failing is logged and skipped.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `test/calendar/service.test.ts`:
 ```ts
@@ -616,12 +616,12 @@ describe("CalendarService.listEvents", () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to confirm it fails**
+- [x] **Step 2: Run the test to confirm it fails**
 
 Run: `npx vitest run test/calendar/service.test.ts`
 Expected: FAIL with "Cannot find module '../../src/calendar/service.js'".
 
-- [ ] **Step 3: Implement `src/calendar/service.ts`**
+- [x] **Step 3: Implement `src/calendar/service.ts`**
 
 ```ts
 import type { CalendarService, Deps } from "../ports.js";
@@ -739,12 +739,12 @@ export function createCalendarService(deps: CalendarDeps, api: CalendarApiFactor
 }
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `npx vitest run test/calendar && npm run typecheck`
 Expected: PASS, 12 tests (3 api + 9 service), and typecheck exits 0.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/calendar/service.ts test/calendar/service.test.ts
@@ -776,7 +776,7 @@ git commit -m "feat(calendar): CalendarService merging both accounts with dedupe
   - `googleClassroomApi: ClassroomApiFactory`
   - `isPermissionDenied(err: unknown): boolean`
 
-- [ ] **Step 1: Write the failing due-date test**
+- [x] **Step 1: Write the failing due-date test**
 
 `test/classroom/due.test.ts`:
 ```ts
@@ -819,7 +819,7 @@ describe("classroomDueAt", () => {
 });
 ```
 
-- [ ] **Step 2: Write the failing Classroom adapter test**
+- [x] **Step 2: Write the failing Classroom adapter test**
 
 `test/classroom/api.test.ts`:
 ```ts
@@ -975,12 +975,12 @@ describe("classroomApiFromClient", () => {
 });
 ```
 
-- [ ] **Step 3: Run the tests to confirm they fail**
+- [x] **Step 3: Run the tests to confirm they fail**
 
 Run: `npx vitest run test/classroom/due.test.ts test/classroom/api.test.ts`
 Expected: FAIL with "Cannot find module '../../src/classroom/due.js'" (and the same for `api.js`).
 
-- [ ] **Step 4: Implement `src/classroom/due.ts`**
+- [x] **Step 4: Implement `src/classroom/due.ts`**
 
 ```ts
 import { sgtAt } from "../lib/clock.js";
@@ -1020,7 +1020,7 @@ export function classroomDueAt(date?: ClassroomDate | null, time?: ClassroomTime
 }
 ```
 
-- [ ] **Step 5: Implement `src/classroom/api.ts`**
+- [x] **Step 5: Implement `src/classroom/api.ts`**
 
 ```ts
 import { google } from "googleapis";
@@ -1253,13 +1253,13 @@ export const googleClassroomApi: ClassroomApiFactory = (auth) => {
 };
 ```
 
-- [ ] **Step 6: Run the tests**
+- [x] **Step 6: Run the tests**
 
 Run: `npx vitest run test/classroom/due.test.ts test/classroom/api.test.ts && npm run typecheck`
 Expected: PASS, 13 tests (6 due + 7 api), and typecheck exits 0.
 If typecheck rejects a `googleClassroomApi` line, widen the matching `Raw*` field to the googleapis `Schema$*` type. Do not cast to `any`.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/classroom/due.ts src/classroom/api.ts test/classroom/due.test.ts test/classroom/api.test.ts
@@ -1288,7 +1288,7 @@ git commit -m "feat(classroom): UTC due-date conversion and paginated Classroom 
 
 This extractor is self-contained on purpose. Plan 01 owns email triage, so nothing is imported from `src/triage/*`.
 
-- [ ] **Step 1: Write the fake Anthropic test helper**
+- [x] **Step 1: Write the fake Anthropic test helper**
 
 `test/classroom/fake-anthropic.ts`:
 ```ts
@@ -1330,7 +1330,7 @@ export function fakeAnthropic(handler: (body: Record<string, any>) => FakeReply)
 export const jsonReply = (value: unknown): FakeReply => ({ text: JSON.stringify(value) });
 ```
 
-- [ ] **Step 2: Write the failing test**
+- [x] **Step 2: Write the failing test**
 
 `test/classroom/announcement.test.ts`:
 ```ts
@@ -1415,12 +1415,12 @@ describe("normaliseModelDate", () => {
 });
 ```
 
-- [ ] **Step 3: Run the test to confirm it fails**
+- [x] **Step 3: Run the test to confirm it fails**
 
 Run: `npx vitest run test/classroom/announcement.test.ts`
 Expected: FAIL with "Cannot find module '../../src/classroom/announcement.js'".
 
-- [ ] **Step 4: Implement `src/classroom/announcement.ts`**
+- [x] **Step 4: Implement `src/classroom/announcement.ts`**
 
 ```ts
 import { z } from "zod";
@@ -1532,13 +1532,13 @@ export async function extractAnnouncement(
 }
 ```
 
-- [ ] **Step 5: Run the tests**
+- [x] **Step 5: Run the tests**
 
 Run: `npx vitest run test/classroom/announcement.test.ts && npm run typecheck`
 Expected: PASS, 6 tests, and typecheck exits 0.
 If "returns null on a refusal" fails because `messages.parse` returns non-null `parsed_output` for an empty refusal body, the `stop_reason` check above still returns `null`. If it fails another way, check the SDK's refusal shape in `node_modules/@anthropic-ai/sdk` and keep the `stop_reason === "refusal"` check first.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/classroom/announcement.ts test/classroom/fake-anthropic.ts test/classroom/announcement.test.ts
@@ -1574,7 +1574,7 @@ Rules (spec §7a, §10):
 - **Every attempt that gets past the enabled check writes `state.classroom.lastSyncAt = now`**, including handled and unhandled failures (via `finally`).
 - Per-course steps run in order, each in its own try/catch. One failing course or step doesn't stop the rest. `invalid_grant` inside a step is re-thrown.
 
-- [ ] **Step 1: Write the test helpers**
+- [x] **Step 1: Write the test helpers**
 
 `test/classroom/fakes.ts`:
 ```ts
@@ -1643,7 +1643,7 @@ export function announcement(over: Partial<ClassroomAnnouncement> & { id: string
 }
 ```
 
-- [ ] **Step 2: Write the failing test**
+- [x] **Step 2: Write the failing test**
 
 `test/classroom/service.sync.test.ts`:
 ```ts
@@ -1768,12 +1768,12 @@ describe("ClassroomService guards and throttling", () => {
 });
 ```
 
-- [ ] **Step 3: Run the test to confirm it fails**
+- [x] **Step 3: Run the test to confirm it fails**
 
 Run: `npx vitest run test/classroom/service.sync.test.ts`
 Expected: FAIL with "Cannot find module '../../src/classroom/service.js'".
 
-- [ ] **Step 4: Implement the skeleton `src/classroom/service.ts`**
+- [x] **Step 4: Implement the skeleton `src/classroom/service.ts`**
 
 ```ts
 import type { ClassroomService, Deps, SyncResult } from "../ports.js";
@@ -1884,12 +1884,12 @@ export function createClassroomService(
 }
 ```
 
-- [ ] **Step 5: Run the tests**
+- [x] **Step 5: Run the tests**
 
 Run: `npx vitest run test/classroom/service.sync.test.ts && npm run typecheck`
 Expected: PASS, 8 tests, and typecheck exits 0.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/classroom/service.ts test/classroom/fakes.ts test/classroom/service.sync.test.ts
@@ -1920,7 +1920,7 @@ Rules:
 - Alerts: push `result.item` to `SyncResult.alerts` when `shouldAlert(result, { importance: "high", senderEmail: null }, settings, now)`. Never set `alertedAt` here; the Notifier does that.
 - Done items are never reopened. `upsertItem` never reopens, and a `RECLAIMED_BY_STUDENT` submission doesn't reopen anything.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `test/classroom/service.coursework.test.ts`:
 ```ts
@@ -2056,12 +2056,12 @@ describe("Classroom coursework sync", () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to confirm it fails**
+- [x] **Step 2: Run the test to confirm it fails**
 
 Run: `npx vitest run test/classroom/service.coursework.test.ts`
 Expected: FAIL. The first assertion fails because no item is created (for example `expected null to match object`), since `courseSteps` is still empty.
 
-- [ ] **Step 3: Add coursework sync to `src/classroom/service.ts`**
+- [x] **Step 3: Add coursework sync to `src/classroom/service.ts`**
 
 3a. Replace the import block at the top of the file with:
 ```ts
@@ -2154,12 +2154,12 @@ with:
   const courseSteps: Array<[string, CourseStep]> = [["coursework", syncCourseWork]];
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `npx vitest run test/classroom && npm run typecheck`
 Expected: PASS, 37 tests (6 due + 7 api + 6 announcement + 8 sync + 10 coursework), and typecheck exits 0.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/classroom/service.ts test/classroom/service.coursework.test.ts
@@ -2190,7 +2190,7 @@ Rules:
 - `SyncResult.fetched` counts announcements in the window. `triaged` counts successful model extractions. Alerts use the same `collect` as coursework.
 - The announcements step is isolated, so a 403 there (missing scope) doesn't stop coursework.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `test/classroom/service.announcements.test.ts`:
 ```ts
@@ -2307,12 +2307,12 @@ describe("Classroom announcement sync", () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to confirm it fails**
+- [x] **Step 2: Run the test to confirm it fails**
 
 Run: `npx vitest run test/classroom/service.announcements.test.ts`
 Expected: FAIL. "summarises a new announcement into an info item" gets `null` from `find("classroom:announcement:a1")`, because no announcements step exists yet. The last test passes already.
 
-- [ ] **Step 3: Write the final `src/classroom/service.ts`**
+- [x] **Step 3: Write the final `src/classroom/service.ts`**
 
 Replace the whole file with:
 ```ts
@@ -2546,7 +2546,7 @@ export function createClassroomService(
 }
 ```
 
-- [ ] **Step 4: Run the full suite**
+- [x] **Step 4: Run the full suite**
 
 Run: `npx vitest run test/classroom test/calendar test/google/collect-pages.test.ts && npm test && npm run typecheck`
 Expected:
@@ -2554,7 +2554,7 @@ Expected:
 - Calendar: 12 tests pass. Pager: 4 tests pass.
 - `npm test` passes overall (Firestore is skipped without the emulator), and typecheck exits 0.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/classroom/service.ts test/classroom/service.announcements.test.ts
