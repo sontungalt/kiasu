@@ -1847,7 +1847,7 @@ The steps run in this order, and the report keys are added in the same order:
 
 A step that throws is recorded as `{ error: message }` and logged, and the remaining steps continue.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `test/scheduler/tick.test.ts`:
 ```ts
@@ -2005,12 +2005,12 @@ describe("tick", () => {
 });
 ```
 
-- [ ] **Step 2: Run the test to confirm it fails**
+- [x] **Step 2: Run the test to confirm it fails**
 
 Run: `npx vitest run test/scheduler/tick.test.ts`
 Expected: FAIL, because `../../src/scheduler/tick.js` can't be resolved.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 `src/scheduler/tick.ts`:
 ```ts
@@ -2105,12 +2105,12 @@ export async function tick(deps: Deps, now: Date = deps.clock.now()): Promise<Ti
 }
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `npx vitest run test/scheduler && npm run typecheck`
 Expected: `18 passed` (5 nudges + 6 briefs + 7 tick), and typecheck exits 0.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/scheduler/tick.ts test/scheduler/tick.test.ts
