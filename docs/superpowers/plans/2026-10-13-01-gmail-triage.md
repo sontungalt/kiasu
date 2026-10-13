@@ -559,7 +559,7 @@ git commit -m "feat(gmail): fakeable Gmail API port over googleapis"
 
 Rules: prefer `text/plain`, and fall back to HTML converted to text. Walk nested multiparts. Any part with a filename is an attachment (its name is collected and its body skipped). Decode using the part's charset. The received time is `internalDate`, then the `Date` header, then `fallbackDate`.
 
-- [ ] **Step 1: Write the fixtures**
+- [x] **Step 1: Write the fixtures**
 
 `test/fixtures/gmail-messages.ts`:
 ```ts
@@ -770,7 +770,7 @@ export const metadataOnly: GmailMessage = {
 };
 ```
 
-- [ ] **Step 2: Write the failing tests**
+- [x] **Step 2: Write the failing tests**
 
 `test/gmail/parse.test.ts`:
 ```ts
@@ -884,12 +884,12 @@ describe("helpers", () => {
 });
 ```
 
-- [ ] **Step 3: Run the tests to confirm they fail**
+- [x] **Step 3: Run the tests to confirm they fail**
 
 Run: `npx vitest run test/gmail/parse.test.ts`
 Expected: FAIL, `../../src/gmail/parse.js` not found.
 
-- [ ] **Step 4: Implement `src/gmail/parse.ts`**
+- [x] **Step 4: Implement `src/gmail/parse.ts`**
 
 ```ts
 import { convert } from "html-to-text";
@@ -1043,12 +1043,12 @@ export function searchHitFromMessage(msg: GmailMessage, account: AccountId, fall
 }
 ```
 
-- [ ] **Step 5: Run the tests**
+- [x] **Step 5: Run the tests**
 
 Run: `npx vitest run test/gmail/parse.test.ts && npm run typecheck`
 Expected: 10 passed.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/gmail/parse.ts test/fixtures/gmail-messages.ts test/gmail/parse.test.ts
