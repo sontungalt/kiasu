@@ -1839,7 +1839,7 @@ git commit -m "feat(gmail): account guard for missing token, invalid_grant and r
   - `ingestParsed(ctx, parsed): Promise<SyncResult>`. It records the email. A pre-filtered email becomes `skipped`. Otherwise it's stored `pending` first (so a crash leaves it retryable) and then passed to `triageRecord`.
   - `triageRecord(ctx, record, parsed): Promise<TriageOutcome>`. On success it saves the summary, sets `done` and upserts items (none for Classroom senders), and collects `shouldAlert` hits. On failure it adds an attempt and stays `pending`, becoming `failed` at 5 attempts or straight away on a refusal.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `test/gmail/process.test.ts`:
 ```ts
@@ -1994,12 +1994,12 @@ describe("triageRecord failures", () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests to confirm they fail**
+- [x] **Step 2: Run the tests to confirm they fail**
 
 Run: `npx vitest run test/gmail/process.test.ts`
 Expected: FAIL, `../../src/gmail/process.js` not found.
 
-- [ ] **Step 3: Implement `src/gmail/process.ts`**
+- [x] **Step 3: Implement `src/gmail/process.ts`**
 
 ```ts
 import type { Deps, SyncResult } from "../ports.js";
@@ -2124,12 +2124,12 @@ export async function triageRecord(ctx: ProcessCtx, record: EmailRecord, parsed:
 }
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `npx vitest run test/gmail/process.test.ts && npm run typecheck`
 Expected: 12 passed (the `it.each` counts as 4).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/gmail/process.ts test/gmail/process.test.ts
