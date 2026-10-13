@@ -105,7 +105,7 @@ package.json              # + "eval:triage", "export:fixtures" scripts
   - `httpStatusOf(err: unknown): number | null`, `errInfo(err: unknown): { name: string; status: number | null; message: string }`
   - Test helpers: `class FakeGmailApi implements GmailApi`, `buildMessage(opts)`, `httpError(status)`, `invalidGrantError()`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `test/gmail/api.test.ts`:
 ```ts
@@ -259,12 +259,12 @@ describe("FakeGmailApi", () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests to confirm they fail**
+- [x] **Step 2: Run the tests to confirm they fail**
 
 Run: `npx vitest run test/gmail/api.test.ts test/gmail/fake-gmail.test.ts`
 Expected: FAIL, with `../../src/gmail/api.js` and `../helpers/fake-gmail.js` not found.
 
-- [ ] **Step 3: Implement `src/gmail/api.ts`**
+- [x] **Step 3: Implement `src/gmail/api.ts`**
 
 ```ts
 import { google, type gmail_v1 } from "googleapis";
@@ -406,7 +406,7 @@ export function createGmailApiFactory(config: Config): GmailApiFactory {
 }
 ```
 
-- [ ] **Step 4: Implement `test/helpers/fake-gmail.ts`**
+- [x] **Step 4: Implement `test/helpers/fake-gmail.ts`**
 
 ```ts
 import type { GmailApi, GmailMessage, MessageRef } from "../../src/gmail/api.js";
@@ -529,12 +529,12 @@ export class FakeGmailApi implements GmailApi {
 }
 ```
 
-- [ ] **Step 5: Run the tests**
+- [x] **Step 5: Run the tests**
 
 Run: `npx vitest run test/gmail/api.test.ts test/gmail/fake-gmail.test.ts && npm run typecheck`
 Expected: 11 passed (9 + 2), and typecheck exits 0.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/gmail/api.ts test/helpers/fake-gmail.ts test/gmail/api.test.ts test/gmail/fake-gmail.test.ts
