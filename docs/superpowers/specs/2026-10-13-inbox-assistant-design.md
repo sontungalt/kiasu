@@ -1,7 +1,7 @@
 # Kiasu: Design Spec
 
 **Date:** 2026-10-13
-**Status:** Approved in chat. Awaiting review of this written spec.
+**Status:** Approved (2026-10-13). Calendar and Classroom added to v1 (§7a).
 **Name:** Kiasu (repo and package `kiasu-assistant`)
 
 ## 1. Purpose
@@ -23,17 +23,16 @@ It is modelled on The Librarian (thelibrarian.io), with these improvements:
 5. Running cost: about $0 for Google Cloud and no more than about $8/month for Claude.
 
 ### Out of scope for v1
-Sending, replying to, deleting or forwarding emails. Voice notes and images. Calendar, timetable and Classroom (coming in v2 and v3). Multiple users. A web dashboard.
+Sending, replying to, deleting or forwarding emails. Voice notes and images. Timetable (coming in v2). Multiple users. A web dashboard.
 
 ## 2. Phases
 
 | Phase | Scope |
 |---|---|
-| **v1** | Both Gmail inboxes, triage into items, WhatsApp two-way chat, morning brief, evening check-in, urgent alerts, my own reminders, deadline nudges |
-| **v2** | Google Calendar (both accounts) in briefs and chat. Weekly timetable sent as a photo, parsed once and stored. |
-| **v3** | Google Classroom: assignments, due dates and announcements from the school account |
+| **v1** | Both Gmail inboxes, triage into items, WhatsApp two-way chat, morning brief, evening check-in, urgent alerts, my own reminders, deadline nudges, **Google Calendar (both accounts)**, **Google Classroom (school account)** |
+| **v2** | Weekly timetable sent as a photo, parsed once and stored |
 
-Each phase is usable on its own. This spec covers v1 in detail. v2 and v3 get their own spec and plan when we reach them.
+*Change 2026-10-13: Calendar and Classroom moved from v2/v3 into v1 at my request, so the work can be split across parallel agents. They are specified in §7a.*
 
 ## 3. Key decisions
 
@@ -188,6 +187,24 @@ TriageResult = {
 - API errors: retried with backoff (the SDK retries 2 times, then the email stays `pending` and the next tick retries it, up to 5 attempts).
 - `stop_reason: "refusal"` or repeated failure: marked `failed`. The brief then lists it as "1 email couldn't be read automatically: *<subject>*".
 
+## 7a. Calendar and Classroom
+
+**One Google login per account covers every source.** The OAuth scopes are `gmail.readonly`, `calendar.readonly`, `classroom.courses.readonly`, `classroom.coursework.me.readonly` and `classroom.announcements.readonly`. Classroom scopes are only used with the school account, but requesting them for both keeps one auth flow. If the school admin blocks Classroom scopes, Classroom is turned off with `CLASSROOM_ENABLED=false` and everything else keeps working.
+
+**Calendar** (both accounts, read live, never stored):
+- `listEvents(from, to)` lists events from every calendar I've selected in each account, merged and sorted. All-day events are flagged.
+- The morning brief gains a *"🗓 Today"* section (events with times) before the item sections. The evening check-in gains *"Tomorrow"* events.
+- The chat agent gains a `list_events({from, to})` tool.
+- Calendar events aren't turned into items, because they're already scheduled. The bot just tells me about them.
+
+**Classroom** (school account, synced on every tick at most once per 30 minutes):
+- For every `ACTIVE` course, list `courseWork` (assignments) and my submission state:
+  - Work with a due date that isn't `TURNED_IN` or `RETURNED` becomes an item: `type: "deadline"`, `dedupeKey: "classroom:{courseWorkId}"`, source `{kind: "classroom", courseId, courseName, courseWorkId, link}`.
+  - Once it's turned in, the item is set to `done` automatically.
+  - If the due date changes, the item is updated, and that change goes through the normal alert rules (§8.3).
+- Announcements from the last 7 days are summarised. Each one becomes an `info` item, unless it states a deadline, in which case it becomes a `deadline` item. Announcements go through the same Haiku triage as emails, using a `classroom:announcement:{id}` dedupe key.
+- **Avoiding duplicates with Classroom notification emails:** Classroom also emails "New assignment: …" notices to the school inbox. Emails from `classroom.google.com` / `no-reply@classroom.google.com` are recorded and summarised but **create no items**, because Classroom sync is the source of truth for those.
+
 ## 8. Messaging
 
 ### 8.1 WhatsApp 24-hour window
@@ -276,6 +293,7 @@ Each step is wrapped in its own try/catch, so one failure doesn't block the rest
 | `snooze_item({ref, until})` | Snoozes an item |
 | `create_reminder({text, at})` | Creates a reminder for a natural-language time already resolved to ISO |
 | `add_task({title, dueAt?, details?})` | Adds a manual item |
+| `list_events({from, to})` | Calendar events from both accounts in the range (§7a) |
 | `get_status()` | Sync health for each account, last brief times, and whether the WhatsApp window is open |
 
 - **Security:** only messages from `MY_WHATSAPP_NUMBER` are processed. All others are dropped and logged. Gmail scope is `gmail.readonly`, and no tool can send, delete or forward mail. The worst a prompt-injected email can do is make the bot say something odd to me.
@@ -316,9 +334,9 @@ Logging is structured JSON to Cloud Logging. It never logs email bodies.
 - `GOOGLE_REFRESH_TOKEN_PERSONAL`, `GOOGLE_REFRESH_TOKEN_SCHOOL`
 - `WA_ACCESS_TOKEN` (a permanent System User token), `WA_APP_SECRET`, `WA_VERIFY_TOKEN`
 
-**Plain config:** `WA_PHONE_NUMBER_ID`, `MY_WHATSAPP_NUMBER`, `TRIAGE_MODEL`, `CHAT_MODEL`, `GCP_PROJECT`, `PUBSUB_TOPIC`, `TASKS_QUEUE`, `PUBLIC_BASE_URL`.
+**Plain config:** `WA_PHONE_NUMBER_ID`, `MY_WHATSAPP_NUMBER` (digits only, e.g. `65XXXXXXXX`), `CLASSROOM_ENABLED`, `TRIAGE_MODEL`, `CHAT_MODEL`, `GCP_PROJECT`, `PUBSUB_TOPIC`, `TASKS_QUEUE`, `PUBLIC_BASE_URL`.
 
-**Google OAuth:** Desktop-type OAuth client in my GCP project. The consent screen is *External* with publishing status **"In production"**, which avoids the 7-day refresh-token expiry of Testing mode. It stays unverified, so I click past the warning, which is fine for personal use. `npm run auth -- personal|school` runs a loopback OAuth flow (`access_type=offline`, `prompt=consent`, scope `gmail.readonly`) and writes the refresh token to Secret Manager. v2 and v3 re-run this with the extra scopes.
+**Google OAuth:** Desktop-type OAuth client in my GCP project. The consent screen is *External* with publishing status **"In production"**, which avoids the 7-day refresh-token expiry of Testing mode. It stays unverified, so I click past the warning, which is fine for personal use. `npm run auth -- personal|school` runs a loopback OAuth flow (`access_type=offline`, `prompt=consent`, all scopes from §7a) and writes the refresh token to Secret Manager.
 
 **GCP setup:** `scripts/setup-gcp.sh` enables the APIs and creates the Pub/Sub topic (granting `gmail-api-push@system.gserviceaccount.com` publish rights), the push subscription, the Cloud Tasks queue, the scheduler job, the service accounts and the secrets. It's idempotent.
 
