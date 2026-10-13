@@ -2152,7 +2152,7 @@ git commit -m "feat(gmail): process one email into record, items and alert candi
   - `searchEmails(ctx, query, opts?: { account?: AccountId; limit?: number }): Promise<EmailSearchHit[]>`. `limit` defaults to 10 and is clamped to 1..25. Results are newest first. Accounts without a token, or with an error, are skipped.
   - `readEmail(ctx, emailId): Promise<ParsedEmail | null>`. It uses the stored record's account, or else tries both accounts. A 404 or 400 means `null`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `test/gmail/watch.test.ts`:
 ```ts
@@ -2285,12 +2285,12 @@ describe("readEmail", () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests to confirm they fail**
+- [x] **Step 2: Run the tests to confirm they fail**
 
 Run: `npx vitest run test/gmail/watch.test.ts test/gmail/lookup.test.ts`
 Expected: FAIL, modules not found.
 
-- [ ] **Step 3: Implement `src/gmail/watch.ts`**
+- [x] **Step 3: Implement `src/gmail/watch.ts`**
 
 ```ts
 import type { AccountId } from "../types.js";
@@ -2325,7 +2325,7 @@ export async function renewWatch(ctx: GmailCtx, account: AccountId): Promise<voi
 }
 ```
 
-- [ ] **Step 4: Implement `src/gmail/lookup.ts`**
+- [x] **Step 4: Implement `src/gmail/lookup.ts`**
 
 ```ts
 import { ACCOUNT_IDS, type AccountId, type EmailSearchHit, type ParsedEmail } from "../types.js";
@@ -2379,12 +2379,12 @@ export async function readEmail(ctx: GmailCtx, emailId: string): Promise<ParsedE
 }
 ```
 
-- [ ] **Step 5: Run the tests**
+- [x] **Step 5: Run the tests**
 
 Run: `npx vitest run test/gmail/watch.test.ts test/gmail/lookup.test.ts && npm run typecheck`
 Expected: 9 passed (4 + 5).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/gmail/watch.ts src/gmail/lookup.ts test/gmail/watch.test.ts test/gmail/lookup.test.ts
