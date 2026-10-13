@@ -19,6 +19,8 @@ export function taskIdFor(messageId: string): string {
 }
 
 export function createCloudTaskQueue(config: Config, client?: Pick<CloudTasksClient, "createTask">): TaskQueue {
+  const { TASKS_QUEUE: queue, INVOKER_SERVICE_ACCOUNT: invoker } = config;
+  if (!queue || !invoker) throw new Error("Cloud Tasks needs TASKS_QUEUE and INVOKER_SERVICE_ACCOUNT");
   const url = `${config.PUBLIC_BASE_URL.replace(/\/$/, "")}${HANDLE_MESSAGE_PATH}`;
   let tasks = client;
   return {
@@ -26,15 +28,15 @@ export function createCloudTaskQueue(config: Config, client?: Pick<CloudTasksCli
       tasks ??= new CloudTasksClient();
       try {
         await tasks.createTask({
-          parent: config.TASKS_QUEUE,
+          parent: queue,
           task: {
-            name: `${config.TASKS_QUEUE}/tasks/${taskIdFor(msg.id)}`,
+            name: `${queue}/tasks/${taskIdFor(msg.id)}`,
             httpRequest: {
               httpMethod: "POST",
               url,
               headers: { "Content-Type": "application/json" },
               body: Buffer.from(JSON.stringify(msg)).toString("base64"),
-              oidcToken: { serviceAccountEmail: config.INVOKER_SERVICE_ACCOUNT, audience: url },
+              oidcToken: { serviceAccountEmail: invoker, audience: url },
             },
           },
         });

@@ -1,5 +1,6 @@
 export const TEST_ENV: Record<string, string> = {
   NODE_ENV: "test",
+  MESSENGER: "whatsapp",
   GCP_PROJECT: "demo-inbox",
   PUBLIC_BASE_URL: "https://bot.example.com",
   ANTHROPIC_API_KEY: "sk-ant-test",

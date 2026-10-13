@@ -40,8 +40,9 @@ export const registerWhatsAppRoutes: RouteRegistrar = async (app, deps) => {
     const q = request.query as Record<string, unknown>;
     const token = q["hub.verify_token"];
     const challenge = q["hub.challenge"];
+    const expected = deps.config.WA_VERIFY_TOKEN;
     if (q["hub.mode"] === "subscribe" && typeof token === "string" && typeof challenge === "string"
-      && safeEqual(token, deps.config.WA_VERIFY_TOKEN)) {
+      && expected && safeEqual(token, expected)) {
       return reply.code(200).type("text/plain").send(challenge);
     }
     deps.log.warn("whatsapp: verification handshake rejected");
@@ -50,7 +51,8 @@ export const registerWhatsAppRoutes: RouteRegistrar = async (app, deps) => {
 
   app.post("/webhooks/whatsapp", async (request, reply) => {
     const raw = Buffer.isBuffer(request.body) ? request.body : Buffer.alloc(0);
-    if (!verifyMetaSignature(raw, request.headers["x-hub-signature-256"], deps.config.WA_APP_SECRET)) {
+    const appSecret = deps.config.WA_APP_SECRET;
+    if (!appSecret || !verifyMetaSignature(raw, request.headers["x-hub-signature-256"], appSecret)) {
       deps.log.warn("whatsapp: bad webhook signature");
       return reply.code(401).send({ error: "bad signature" });
     }

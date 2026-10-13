@@ -19,6 +19,11 @@ async function main(): Promise<number> {
   const filled = await fillFromSecretManager(process.env, ALL_SECRET_KEYS, projectFromEnv(process.env));
   if (filled.length > 0) console.log(`Filled from Secret Manager: ${filled.join(", ")}`);
   const config = loadConfig({ ...process.env, NODE_ENV: "development", DEV_SKIP_OIDC: "false" });
+  const topic = config.GMAIL_PUBSUB_TOPIC;
+  if (!topic) {
+    console.log("GMAIL_PUBSUB_TOPIC isn't set, so Gmail push is off and the 5-minute tick polls instead. Nothing to do.");
+    return 0;
+  }
   const { deps } = buildDeps(config, { env: { STORE: "firestore" } });
 
   let failures = 0;
@@ -35,7 +40,7 @@ async function main(): Promise<number> {
     } catch (err) {
       failures++;
       console.log(`❌ ${account}: ${err instanceof Error ? err.message : String(err)}`);
-      const hint = watchErrorHint(err, config.GMAIL_PUBSUB_TOPIC);
+      const hint = watchErrorHint(err, topic);
       if (hint) console.log(`   ${hint}`);
     }
   }

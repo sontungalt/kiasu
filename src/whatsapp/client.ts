@@ -51,18 +51,22 @@ interface GraphResponse {
 }
 
 export function createWhatsAppClient(config: Config, fetchImpl: typeof fetch = fetch): WhatsAppClient {
-  const url = `https://graph.facebook.com/${config.WA_GRAPH_VERSION}/${config.WA_PHONE_NUMBER_ID}/messages`;
+  const { WA_PHONE_NUMBER_ID: phoneNumberId, WA_ACCESS_TOKEN: accessToken, MY_WHATSAPP_NUMBER: to } = config;
+  if (!phoneNumberId || !accessToken || !to) {
+    throw new Error("WhatsApp isn't configured: set WA_PHONE_NUMBER_ID, WA_ACCESS_TOKEN and MY_WHATSAPP_NUMBER");
+  }
+  const url = `https://graph.facebook.com/${config.WA_GRAPH_VERSION}/${phoneNumberId}/messages`;
 
   async function post(payload: Record<string, unknown>): Promise<string> {
     let res: Response;
     try {
       res = await fetchImpl(url, {
         method: "POST",
-        headers: { authorization: `Bearer ${config.WA_ACCESS_TOKEN}`, "content-type": "application/json" },
+        headers: { authorization: `Bearer ${accessToken}`, "content-type": "application/json" },
         body: JSON.stringify({
           messaging_product: "whatsapp",
           recipient_type: "individual",
-          to: config.MY_WHATSAPP_NUMBER,
+          to,
           ...payload,
         }),
         signal: AbortSignal.timeout(15_000),

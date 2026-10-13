@@ -48,6 +48,37 @@ describe("renewWatch", () => {
     expect(await deps.store.accounts.get("school")).toMatchObject({ historyId: "50", watchExpiresAt: "2026-10-21T00:00:00.000Z" });
   });
 
+  describe("without GMAIL_PUBSUB_TOPIC (polling only)", () => {
+    function pollingSetup(api: FakeGmailApi) {
+      const s = setup(api);
+      s.ctx.config = { ...s.ctx.config, GMAIL_PUBSUB_TOPIC: undefined };
+      return s;
+    }
+
+    it("never calls users.watch; bootstraps only the email and leaves historyId for syncAccount", async () => {
+      const api = new FakeGmailApi("Me@Students.school.edu.sg");
+      const { deps, ctx } = pollingSetup(api);
+      await renewWatch(ctx, "school");
+      expect(api.calls).toEqual(["getProfile"]);
+      expect(await deps.store.accounts.get("school")).toEqual({
+        id: "school", email: "me@students.school.edu.sg", historyId: null,
+        watchExpiresAt: null, lastSyncAt: null, authStatus: "ok",
+      });
+    });
+
+    it("does nothing once the email is known, even with no watch recorded", async () => {
+      const api = new FakeGmailApi();
+      const { deps, ctx } = pollingSetup(api);
+      await deps.store.accounts.upsert({
+        id: "school", email: "me@students.school.edu.sg", historyId: "50",
+        watchExpiresAt: null, lastSyncAt: null, authStatus: "ok",
+      });
+      await renewWatch(ctx, "school");
+      expect(api.calls).toEqual([]);
+      expect(await deps.store.accounts.get("school")).toMatchObject({ historyId: "50", watchExpiresAt: null });
+    });
+  });
+
   it("is a no-op without a refresh token", async () => {
     const { deps, ctx } = setup(null);
     await renewWatch(ctx, "school");

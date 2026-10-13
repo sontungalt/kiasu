@@ -59,6 +59,22 @@ describe("WhatsApp webhook routes", () => {
       headers: { "content-type": "application/json", ...(signature ? { "x-hub-signature-256": signature } : {}) },
     });
 
+  it("without WA_VERIFY_TOKEN / WA_APP_SECRET, rejects the handshake and every POST", async () => {
+    const bare = makeTestDeps({ tasks: { enqueueInbound: async (m) => void enqueued.push(m) } });
+    bare.config = { ...bare.config, WA_VERIFY_TOKEN: undefined, WA_APP_SECRET: undefined };
+    const a = await buildServer(bare, [registerWhatsAppRoutes]);
+    const get = await a.inject({ method: "GET", url: "/webhooks/whatsapp?hub.mode=subscribe&hub.verify_token=&hub.challenge=1" });
+    expect(get.statusCode).toBe(403);
+    const raw = webhookBody([textMsg("wamid.x", "hi")]);
+    const res = await a.inject({
+      method: "POST", url: "/webhooks/whatsapp", payload: raw,
+      headers: { "content-type": "application/json", "x-hub-signature-256": sign(raw, "") },
+    });
+    expect(res.statusCode).toBe(401);
+    expect(enqueued).toEqual([]);
+    await a.close();
+  });
+
   describe("GET verification handshake", () => {
     it("echoes hub.challenge as text/plain when the token matches", async () => {
       const res = await app.inject({ method: "GET", url: "/webhooks/whatsapp?hub.mode=subscribe&hub.verify_token=wa-verify&hub.challenge=1158201444" });

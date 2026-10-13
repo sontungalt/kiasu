@@ -30,6 +30,12 @@ const REENGAGEMENT_BODY = {
 };
 
 describe("createWhatsAppClient", () => {
+  it("refuses to build without the WhatsApp settings (they're optional when MESSENGER=telegram)", () => {
+    const partial = { ...config, WA_PHONE_NUMBER_ID: undefined };
+    expect(() => createWhatsAppClient(partial)).toThrow(/WA_PHONE_NUMBER_ID/);
+    expect(() => createWhatsAppClient({ ...config, MY_WHATSAPP_NUMBER: undefined })).toThrow(/MY_WHATSAPP_NUMBER/);
+  });
+
   it("sendText posts a text message to my number with the bearer token", async () => {
     const f = fakeFetch();
     const res = await createWhatsAppClient(config, f.impl).sendText("hi");

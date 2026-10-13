@@ -27,6 +27,11 @@ function fakeTasksClient(impl: (req: CreateTaskArg) => Promise<unknown> = async 
 }
 
 describe("createCloudTaskQueue", () => {
+  it("refuses to build without TASKS_QUEUE or INVOKER_SERVICE_ACCOUNT", () => {
+    expect(() => createCloudTaskQueue({ ...config, TASKS_QUEUE: undefined })).toThrow(/TASKS_QUEUE/);
+    expect(() => createCloudTaskQueue({ ...config, INVOKER_SERVICE_ACCOUNT: undefined })).toThrow(/INVOKER_SERVICE_ACCOUNT/);
+  });
+
   it("creates an OIDC-authenticated HTTP task for /tasks/handle-message", async () => {
     const fake = fakeTasksClient();
     await createCloudTaskQueue(config, fake.client).enqueueInbound(MSG);

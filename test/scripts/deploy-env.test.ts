@@ -13,6 +13,7 @@ describe("buildRunEnv", () => {
     expect(buildRunEnv(dotenv, opts)).toEqual({
       NODE_ENV: "production",
       DEV_SKIP_OIDC: "false",
+      MESSENGER: "whatsapp",
       PUBLIC_BASE_URL: "https://kiasu-assistant-1.asia-southeast1.run.app",
       GCP_PROJECT: "demo-proj",
       GCP_REGION: "asia-southeast1",
