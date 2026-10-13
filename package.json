@@ -19,7 +19,8 @@
     "setup:gcp": "bash scripts/setup-gcp.sh",
     "lint:sh": "shellcheck -x scripts/*.sh scripts/lib/*.sh",
     "deploy": "bash scripts/deploy.sh",
-    "gmail:watch": "tsx --env-file=.env scripts/gmail-watch.ts"
+    "gmail:watch": "tsx --env-file=.env scripts/gmail-watch.ts",
+    "smoke": "tsx --env-file=.env scripts/smoke.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",

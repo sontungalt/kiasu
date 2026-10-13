@@ -2680,7 +2680,7 @@ git commit -m "feat(infra): deploy.sh (Cloud Run + Pub/Sub push + Scheduler, OID
 - Consumes: `createWhatsAppClient(config)` (plan 03); `FirestoreStore`, `createFirestore`, `toUtcIso`, `formatSgt` (plan 00); `fillFromSecretManager`, `projectFromEnv`, `ALL_SECRET_KEYS` (Task 1); `/jobs/tick?now=` with `DEV_SKIP_OIDC=true` (plan 04).
 - Produces: `scripts/lib/smoke.ts`: `type SmokeCommand = "health" | "whatsapp" | "tick" | "close-window" | "all"`, `parseSmokeArgs(argv, env): { command; url: string; now: string | null }`, `isLocalUrl(url): boolean`, `tickUrl(base, now: string | null): string`, `daysBefore(now: Date, days: number): string`. Also npm script `smoke`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `test/scripts/smoke.test.ts`:
 ```ts
@@ -2710,12 +2710,12 @@ describe("smoke helpers", () => {
 });
 ```
 
-- [ ] **Step 2: Run it to confirm it fails**
+- [x] **Step 2: Run it to confirm it fails**
 
 Run: `npx vitest run test/scripts/smoke.test.ts`
 Expected: FAIL, module not found.
 
-- [ ] **Step 3: Implement `scripts/lib/smoke.ts`**
+- [x] **Step 3: Implement `scripts/lib/smoke.ts`**
 
 ```ts
 import { toUtcIso } from "../../src/lib/clock.js";
@@ -2760,7 +2760,7 @@ export function daysBefore(now: Date, days: number): string {
 }
 ```
 
-- [ ] **Step 4: Implement `scripts/smoke.ts`**
+- [x] **Step 4: Implement `scripts/smoke.ts`**
 
 ```ts
 /**
@@ -2834,7 +2834,7 @@ main().then(
 );
 ```
 
-- [ ] **Step 5: Add the npm script and run the tests**
+- [x] **Step 5: Add the npm script and run the tests**
 
 ```bash
 npm pkg set "scripts.smoke=tsx --env-file=.env scripts/smoke.ts"
@@ -2842,7 +2842,7 @@ npx vitest run test/scripts/smoke.test.ts && npm run typecheck
 ```
 Expected: 3 passed, and typecheck exits 0.
 
-- [ ] **Step 6: Write `docs/e2e-checklist.md`**
+- [x] **Step 6: Write `docs/e2e-checklist.md`**
 
 ````markdown
 # End-to-end checklist
@@ -2883,12 +2883,12 @@ Setup: docs/setup.md Part 3 (three terminals). Meta's Callback URL points at the
       report shows about $0 for GCP (spec §14).
 ````
 
-- [ ] **Step 7: Run the checklist (manual)**
+- [ ] (user) **Step 7: Run the checklist (manual)**
 
 Run section A locally, then section B against production.
 Expected: every box ticks. For any failure, use superpowers:systematic-debugging. Fix it in the owning plan's module, with a regression test there.
 
-- [ ] **Step 8: Full suite and commit**
+- [x] **Step 8: Full suite and commit** (`lint:sh` skipped: shellcheck not installed)
 
 ```bash
 npm test && npm run typecheck && npm run lint:sh
