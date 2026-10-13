@@ -971,7 +971,7 @@ git commit -m "feat(brief): evening check-in composer"
 5. Otherwise, compose one grouped message (numbered, at most 8 lines), call `outbox.deliver({kind:"alert", text, template: heads_up [summary ≤ 60]})`, save the numbering to `state/lastList`, and set `alertedAt` on every item.
 6. If `deliver` throws, add the items to the held list (so the next brief still shows them) and rethrow.
 
-- [ ] **Step 1: Write the test fakes**
+- [x] **Step 1: Write the test fakes**
 
 `test/helpers/scheduler-fakes.ts`:
 ```ts
@@ -1043,7 +1043,7 @@ export function makeSchedulerDeps(nowIso: string, over: Partial<Deps> = {}) {
 }
 ```
 
-- [ ] **Step 2: Write the failing test**
+- [x] **Step 2: Write the failing test**
 
 `test/notify/notifier.test.ts`:
 ```ts
@@ -1145,12 +1145,12 @@ describe("Notifier.sendAlerts", () => {
 });
 ```
 
-- [ ] **Step 3: Run the test to confirm it fails**
+- [x] **Step 3: Run the test to confirm it fails**
 
 Run: `npx vitest run test/notify/notifier.test.ts`
 Expected: FAIL, because `../../src/notify/notifier.js` can't be resolved.
 
-- [ ] **Step 4: Implement the held-alerts helpers**
+- [x] **Step 4: Implement the held-alerts helpers**
 
 `src/notify/held.ts`:
 ```ts
@@ -1191,7 +1191,7 @@ export async function pruneHeldAlerts(store: Store): Promise<void> {
 }
 ```
 
-- [ ] **Step 5: Implement the Notifier**
+- [x] **Step 5: Implement the Notifier**
 
 `src/notify/notifier.ts`:
 ```ts
@@ -1262,12 +1262,12 @@ export function createNotifier(deps: Pick<Deps, "clock" | "log" | "store" | "out
 }
 ```
 
-- [ ] **Step 6: Run the tests**
+- [x] **Step 6: Run the tests**
 
 Run: `npx vitest run test/notify && npm test && npm run typecheck`
 Expected: `7 passed` for the notifier, the full suite green, and typecheck exits 0.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/notify test/notify test/helpers/scheduler-fakes.ts
